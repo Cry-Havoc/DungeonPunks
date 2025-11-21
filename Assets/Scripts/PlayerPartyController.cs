@@ -4,13 +4,18 @@ using System.Collections.Generic;
 
 public class PlayerPartyController : MonoBehaviour
 {
+    public static PlayerPartyController Instance { get; private set; }
+
     [Header("References")]
     public MazeGenerator mazeGenerator;
-    public Camera playerCamera;
+    public Camera playerCamera; 
 
     [Header("Movement Settings")]
     public float moveSpeed = 1f; // Time in seconds to move one cell
     public float turnSpeed = 1f; // Time in seconds to turn 90 degrees
+
+    [Header("Encounter Settings")]
+    [Range(0f, 1f)] public float encounterChance = 0.05f; // 5% chance per step
 
     [Header("Grid Settings")]
     public float cellSize = 2f;
@@ -25,17 +30,29 @@ public class PlayerPartyController : MonoBehaviour
     private bool isMoving = false;
     private Queue<System.Action> commandQueue = new Queue<System.Action>();
 
+    void Awake()
+    {
+        if (Instance == null)
+        {
+            Instance = this;
+        }
+        else
+        {
+            Destroy(gameObject);
+        }
+    }
+
     void Start()
     {
         if (mazeGenerator == null)
         {
-            mazeGenerator = FindObjectOfType<MazeGenerator>();
+            mazeGenerator = MazeGenerator.Instance;
         }
 
         if (playerCamera == null)
         {
             playerCamera = GetComponentInChildren<Camera>();
-        }
+        } 
 
         // Wait a frame for maze to generate, then position player
         StartCoroutine(InitializePosition());
@@ -59,6 +76,9 @@ public class PlayerPartyController : MonoBehaviour
         // Only process input if controller is enabled
         if (!enabled)
             return;
+
+        if(CombatManager.Instance.IsInCombat) 
+            return; 
 
         // Queue movement commands
         if (Input.GetKeyDown(KeyCode.W))
@@ -159,6 +179,9 @@ public class PlayerPartyController : MonoBehaviour
         transform.position = targetPos;
         gridPosition = targetGrid;
         isMoving = false;
+
+        // Check for random encounter
+        CheckForEncounter();
     }
 
     IEnumerator RotateToAngle(float deltaAngle)
@@ -211,5 +234,13 @@ public class PlayerPartyController : MonoBehaviour
     Vector3 GridToWorldPosition(Vector2Int gridPos)
     {
         return new Vector3(gridPos.x * cellSize, 0, gridPos.y * cellSize);
+    }
+
+    void CheckForEncounter()
+    {
+        if (CombatManager.Instance != null && Random.value < encounterChance)
+        {
+            CombatManager.Instance.StartRandomEncounter();
+        }
     }
 }

@@ -3,6 +3,8 @@ using System.Collections.Generic;
 
 public class MazeGenerator : MonoBehaviour
 {
+    public static MazeGenerator Instance { get; private set; }
+
     [Header("Maze Settings")]
     public int SizeOfDungeon = 15;
 
@@ -18,6 +20,18 @@ public class MazeGenerator : MonoBehaviour
     private bool[,] mazeData;
 
     public bool[,] MazeData => mazeData;
+
+    void Awake()
+    {
+        if (Instance == null)
+        {
+            Instance = this;
+        }
+        else
+        {
+            Destroy(gameObject);
+        }
+    }
 
     void Start()
     {

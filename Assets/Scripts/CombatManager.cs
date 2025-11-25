@@ -20,11 +20,11 @@ public class CombatManager : MonoBehaviour
 
     private List<Monster> activeMonsters = new List<Monster>();
     private List<CharacterButton> characterButtons = new List<CharacterButton>();
-    private PlayerCharacter[] partyMembers; 
+    private PlayerCharacter[] partyMembers;
 
     private bool isInCombat = false;
     private bool waitingForSpace = false;
-    private bool isPlayerTurn = true;
+    private bool selectingMonster = false;
     private PlayerCharacter currentActingPlayer;
     private int currentActiveMonsterIndex = 0;
 
@@ -46,14 +46,15 @@ public class CombatManager : MonoBehaviour
 
     void Update()
     {
-        if (waitingForSpace && Input.GetKeyDown(KeyCode.Space))
+        // Only process space if we're waiting and NOT selecting a monster
+        if (waitingForSpace && !selectingMonster && Input.GetKeyDown(KeyCode.Space))
         {
             onSpacePressed?.Invoke();
         }
     }
 
     public void Initialize(PlayerCharacter[] party)
-    { 
+    {
         partyMembers = party;
     }
 
@@ -63,20 +64,31 @@ public class CombatManager : MonoBehaviour
 
         isInCombat = true;
 
+        // Disable player movement immediately
+        if (PlayerPartyController.Instance != null)
+        {
+            PlayerPartyController.Instance.enabled = false;
+        }
+
         // Show encounter warning
         encounterText.text = "You are not alone ... press SPACE to continue";
         encounterImage.gameObject.SetActive(false);
 
         waitingForSpace = true;
+        selectingMonster = false;
         onSpacePressed = InitiateCombat;
     }
 
     void InitiateCombat()
     {
         waitingForSpace = false;
+        selectingMonster = false;
 
         // Switch UI to combat mode
-        GameUIManager.Instance.SetCombatMode();
+        if (GameUIManager.Instance != null)
+        {
+            GameUIManager.Instance.SetCombatMode();
+        }
 
         // Spawn 1-8 monsters
         int monsterCount = Random.Range(1, 9);
@@ -94,6 +106,9 @@ public class CombatManager : MonoBehaviour
         currentActiveMonsterIndex = 0;
         UpdateMonsterDisplay();
         CreateCharacterButtons();
+
+        // Hide monster list initially
+        monsterListUI.SetActive(false);
 
         // Start first player turn
         StartPlayerTurn();
@@ -116,13 +131,11 @@ public class CombatManager : MonoBehaviour
             characterBtn.Initialize(i + 1, activeMonsters[i], this);
             characterButtons.Add(characterBtn);
         }
-
-        monsterListUI.SetActive(true);
     }
 
     void UpdateCharacterButtons()
     {
-        // Remove dead monsters
+        // Remove dead monsters and their buttons
         for (int i = characterButtons.Count - 1; i >= 0; i--)
         {
             if (!activeMonsters[i].IsAlive())
@@ -134,7 +147,7 @@ public class CombatManager : MonoBehaviour
             }
         }
 
-        // Update remaining buttons
+        // Renumber remaining buttons
         for (int i = 0; i < characterButtons.Count; i++)
         {
             characterButtons[i].SetNumber(i + 1);
@@ -159,7 +172,8 @@ public class CombatManager : MonoBehaviour
 
     void StartPlayerTurn()
     {
-        monsterListUI.SetActive(true);
+        waitingForSpace = false;
+        selectingMonster = false;
 
         // Find available players
         List<PlayerCharacter> availablePlayers = partyMembers
@@ -189,19 +203,25 @@ public class CombatManager : MonoBehaviour
 
         encounterText.text = $"{currentActingPlayer.characterName} attacks! Select a monster (1-{activeMonsters.Count}) or click on monster name.";
 
+        // Show monster list and enable selection
+        monsterListUI.SetActive(true);
+        selectingMonster = true;
+
         // Enable monster selection
         foreach (var btn in characterButtons)
         {
             btn.SetSelectable(true);
         }
-
-        waitingForSpace = false;
     }
 
     public void OnMonsterSelected(int monsterIndex)
     {
         if (monsterIndex < 0 || monsterIndex >= activeMonsters.Count) return;
+        if (!selectingMonster) return;
 
+        selectingMonster = false;
+
+        // Hide monster list
         monsterListUI.SetActive(false);
 
         // Disable further selection
@@ -233,9 +253,11 @@ public class CombatManager : MonoBehaviour
 
     void StartMonsterTurn()
     {
-        monsterListUI.SetActive(false);
-
         waitingForSpace = false;
+        selectingMonster = false;
+
+        // Hide monster list
+        monsterListUI.SetActive(false);
 
         // Find available monsters
         List<Monster> availableMonsters = activeMonsters.Where(m => m.IsAlive() && !m.hasActedThisCycle).ToList();
@@ -294,9 +316,8 @@ public class CombatManager : MonoBehaviour
 
     void EndCombat(bool playerVictory)
     {
-        monsterListUI.SetActive(false);
-
         waitingForSpace = false;
+        selectingMonster = false;
         isInCombat = false;
 
         monsterListUI.SetActive(false);
@@ -325,9 +346,8 @@ public class CombatManager : MonoBehaviour
 
     void ReturnToDungeon()
     {
-        monsterListUI.SetActive(false);
-
         waitingForSpace = false;
+        selectingMonster = false;
 
         // Reset player acted flags
         foreach (var player in partyMembers)
@@ -335,7 +355,10 @@ public class CombatManager : MonoBehaviour
             if (player != null) player.hasActedThisCycle = false;
         }
 
-        GameUIManager.Instance.SetDungeonMode();
+        if (GameUIManager.Instance != null)
+        {
+            GameUIManager.Instance.SetDungeonMode();
+        }
     }
 
     void RestartGame()

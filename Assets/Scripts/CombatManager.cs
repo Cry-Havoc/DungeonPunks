@@ -11,21 +11,35 @@ public class CombatManager : MonoBehaviour
     [Header("Monster Prefabs")]
     public List<GameObject> monsterPrefabs;
 
+    [Header("Available Player Actions")]
+    public List<PlayerAction> availableActions;
+
     [Header("UI References")]
     public TextMeshProUGUI encounterText;
     public Image encounterImage;
     public GameObject monsterListUI;
     public GameObject characterButtonPrefab;
+    public GameObject actionButtonPrefab;
+    public GameObject actionResultButtonPrefab;
     public Transform monsterListContainer;
+    public Transform actionListContainer;
+    public Transform actionResultListContainer;
 
     private List<Monster> activeMonsters = new List<Monster>();
     private List<CharacterButton> characterButtons = new List<CharacterButton>();
+    private List<ActionButton> actionButtons = new List<ActionButton>();
+    private List<ActionResultButton> actionResultButtons = new List<ActionResultButton>();
     private PlayerCharacter[] partyMembers;
 
     private bool isInCombat = false;
     private bool waitingForSpace = false;
     private bool selectingMonster = false;
+    private bool selectingAction = false;
+    private bool selectingActionResult = false;
     private PlayerCharacter currentActingPlayer;
+    private PlayerAction currentAction;
+    private Monster currentTarget;
+    private ActionResult currentResult;
     private int currentActiveMonsterIndex = 0;
 
     private System.Action onSpacePressed;
@@ -46,8 +60,8 @@ public class CombatManager : MonoBehaviour
 
     void Update()
     {
-        // Only process space if we're waiting and NOT selecting a monster
-        if (waitingForSpace && !selectingMonster && Input.GetKeyDown(KeyCode.Space))
+        // Only process space if we're waiting and not selecting anything
+        if (waitingForSpace && !selectingMonster && !selectingAction && !selectingActionResult && Input.GetKeyDown(KeyCode.Space))
         {
             onSpacePressed?.Invoke();
         }
@@ -76,13 +90,14 @@ public class CombatManager : MonoBehaviour
 
         waitingForSpace = true;
         selectingMonster = false;
+        selectingAction = false;
+        selectingActionResult = false;
         onSpacePressed = InitiateCombat;
     }
 
     void InitiateCombat()
     {
         waitingForSpace = false;
-        selectingMonster = false;
 
         // Switch UI to combat mode
         if (GameUIManager.Instance != null)
@@ -98,7 +113,7 @@ public class CombatManager : MonoBehaviour
         {
             GameObject prefab = monsterPrefabs[Random.Range(0, monsterPrefabs.Count)];
             Monster monsterCopy = prefab.GetComponent<Monster>().CreateCopy();
-            monsterCopy.gameObject.SetActive(false); // Keep in scene but hidden
+            monsterCopy.gameObject.SetActive(false);
             activeMonsters.Add(monsterCopy);
         }
 
@@ -107,7 +122,7 @@ public class CombatManager : MonoBehaviour
         UpdateMonsterDisplay();
         CreateCharacterButtons();
 
-        // Hide monster list initially
+        // Hide all UI initially
         monsterListUI.SetActive(false);
 
         // Start first player turn
@@ -174,6 +189,8 @@ public class CombatManager : MonoBehaviour
     {
         waitingForSpace = false;
         selectingMonster = false;
+        selectingAction = false;
+        selectingActionResult = false;
 
         // Find available players
         List<PlayerCharacter> availablePlayers = partyMembers
@@ -201,13 +218,63 @@ public class CombatManager : MonoBehaviour
         currentActingPlayer = availablePlayers[Random.Range(0, availablePlayers.Count)];
         currentActingPlayer.hasActedThisCycle = true;
 
-        encounterText.text = $"{currentActingPlayer.characterName} attacks! Select a monster (1-{activeMonsters.Count}) or click on monster name.";
+        encounterText.text = $"It's time for {currentActingPlayer.characterName} to act...";
+
+        // Show action selection
+        ShowActionSelection();
+    }
+
+    void ShowActionSelection()
+    {
+        selectingAction = true;
+
+        // Clear existing action buttons
+        foreach (var btn in actionButtons)
+        {
+            if (btn != null) Destroy(btn.gameObject);
+        }
+        actionButtons.Clear();
+
+        // Get available ActiveCombat actions
+        List<PlayerAction> availableActiveCombatActions = availableActions
+            .Where(a => a.triggerType == ActionTriggerType.ActiveCombat)
+            .ToList();
+
+        // Create action buttons
+        for (int i = 0; i < availableActiveCombatActions.Count; i++)
+        {
+            GameObject btnObj = Instantiate(actionButtonPrefab, actionListContainer);
+            ActionButton actionBtn = btnObj.GetComponent<ActionButton>();
+            actionBtn.Initialize(i + 1, availableActiveCombatActions[i], currentActingPlayer, OnActionSelected);
+            actionBtn.SetSelectable(true);
+            actionButtons.Add(actionBtn);
+        }
+
+        actionListContainer.parent.gameObject.SetActive(true);
+    }
+
+    void OnActionSelected(PlayerAction action)
+    {
+        selectingAction = false;
+        currentAction = action;
+
+        // Hide action list
+        actionListContainer.parent.gameObject.SetActive(false);
+
+        // Disable action buttons
+        foreach (var btn in actionButtons)
+        {
+            btn.SetSelectable(false);
+        }
+
+        // Show target selection
+        string selectionText = action.targetSelectionText.Replace("{CHARACTER}", currentActingPlayer.characterName);
+        encounterText.text = selectionText;
 
         // Show monster list and enable selection
         monsterListUI.SetActive(true);
         selectingMonster = true;
 
-        // Enable monster selection
         foreach (var btn in characterButtons)
         {
             btn.SetSelectable(true);
@@ -220,6 +287,7 @@ public class CombatManager : MonoBehaviour
         if (!selectingMonster) return;
 
         selectingMonster = false;
+        currentTarget = activeMonsters[monsterIndex];
 
         // Hide monster list
         monsterListUI.SetActive(false);
@@ -230,25 +298,326 @@ public class CombatManager : MonoBehaviour
             btn.SetSelectable(false);
         }
 
-        Monster target = activeMonsters[monsterIndex];
-        target.TakeDamage(1);
+        // Start action resolution
+        StartActionResolution();
+    }
 
-        encounterText.text = $"{currentActingPlayer.characterName} attacks {target.monsterName} for 1 damage! Press SPACE to continue.";
+    void StartActionResolution()
+    {
+        // Build context
+        CombatContext context = new CombatContext(
+            currentActingPlayer,
+            currentTarget,
+            activeMonsters.Count,
+            partyMembers.Count(p => p != null && p.healthPoints > 0)
+        );
 
-        UpdateCharacterButtons();
-        UpdateMonsterDisplay();
+        // Show action text
+        encounterText.text = $"{currentActingPlayer.characterName} is {currentAction.actionVerb} {currentTarget.monsterName}...\n";
 
-        waitingForSpace = true;
+        StartCoroutine(ResolveActionWithDice(context));
+    }
 
-        // Check if all monsters dead
-        if (activeMonsters.Count == 0)
+    System.Collections.IEnumerator ResolveActionWithDice(CombatContext context)
+    {
+        // Success Check
+        int successValue = currentAction.GetAttributeValue(currentActingPlayer, currentAction.successCheckAttribute);
+        string successAttr = currentAction.GetAttributeName(currentAction.successCheckAttribute);
+
+        // Apply advantage/disadvantage if player has status effects
+        DiceRoller.RollType successRollType = GetModifiedRollType(currentAction.successRollType, true);
+
+        encounterText.text += $"\nRoll lower than {successAttr} ({successValue})...";
+
+        bool successPassed = false;
+        int successRoll = 0;
+
+        bool rollComplete = false;
+        DiceRoller.Instance.RollForSkillCheck(successValue, successRollType, (result) => {
+            successRoll = result;
+            successPassed = result <= successValue;
+            rollComplete = true;
+        });
+
+        while (!rollComplete) yield return null;
+
+        string rollTypeText = GetRollTypeText(successRollType);
+        encounterText.text += $"\nRoll lower than {successAttr} ({successValue}) - ROLLED {successRoll} {rollTypeText}";
+        encounterText.text += $"\n{currentActingPlayer.characterPronoun} is {(successPassed ? "successful" : "unsuccessful")}...";
+
+        yield return new WaitForSeconds(1f);
+
+        // Critical or Fumble Check
+        if (successPassed)
         {
-            onSpacePressed = () => EndCombat(true);
+            // Critical Check
+            int criticalValue = currentAction.GetAttributeValue(currentActingPlayer, currentAction.criticalCheckAttribute);
+            string criticalAttr = currentAction.GetAttributeName(currentAction.criticalCheckAttribute);
+            DiceRoller.RollType criticalRollType = GetModifiedRollType(currentAction.criticalRollType, true);
+
+            encounterText.text += $"\n\nFor a Critical Success roll lower than {criticalAttr} ({criticalValue})...";
+
+            bool criticalPassed = false;
+            int criticalRoll = 0;
+
+            rollComplete = false;
+            DiceRoller.Instance.RollForSkillCheck(criticalValue, criticalRollType, (result) => {
+                criticalRoll = result;
+                criticalPassed = result <= criticalValue;
+                rollComplete = true;
+            });
+
+            while (!rollComplete) yield return null;
+
+            rollTypeText = GetRollTypeText(criticalRollType);
+            encounterText.text += $"\nRoll lower than {criticalAttr} ({criticalValue}) - ROLLED {criticalRoll} {rollTypeText}";
+
+            currentResult = criticalPassed ? ActionResult.CriticalSuccess : ActionResult.PartlySuccess;
         }
         else
         {
-            onSpacePressed = StartMonsterTurn;
+            // Fumble Check
+            int fumbleValue = currentAction.GetAttributeValue(currentActingPlayer, currentAction.fumbleCheckAttribute);
+            string fumbleAttr = currentAction.GetAttributeName(currentAction.fumbleCheckAttribute);
+            DiceRoller.RollType fumbleRollType = GetModifiedRollType(currentAction.fumbleRollType, false);
+
+            encounterText.text += $"\n\nTo avoid a Fumble roll lower than {fumbleAttr} ({fumbleValue})...";
+
+            bool fumblePassed = false;
+            int fumbleRoll = 0;
+
+            rollComplete = false;
+            DiceRoller.Instance.RollForSkillCheck(fumbleValue, fumbleRollType, (result) => {
+                fumbleRoll = result;
+                fumblePassed = result <= fumbleValue;
+                rollComplete = true;
+            });
+
+            while (!rollComplete) yield return null;
+
+            rollTypeText = GetRollTypeText(fumbleRollType);
+            encounterText.text += $"\nRoll lower than {fumbleAttr} ({fumbleValue}) - ROLLED {fumbleRoll} {rollTypeText}";
+
+            currentResult = fumblePassed ? ActionResult.PartlyFailure : ActionResult.Fumble;
         }
+
+        encounterText.text += $"\n\n<b>{GetResultText(currentResult)}</b>";
+
+        yield return new WaitForSeconds(1f);
+
+        // Show action result selection
+        ShowActionResultSelection();
+    }
+
+    string GetRollTypeText(DiceRoller.RollType rollType)
+    {
+        switch (rollType)
+        {
+            case DiceRoller.RollType.Advantage: return "(Advantage)";
+            case DiceRoller.RollType.Disadvantage: return "(Disadvantage)";
+            default: return "";
+        }
+    }
+
+    string GetResultText(ActionResult result)
+    {
+        switch (result)
+        {
+            case ActionResult.CriticalSuccess: return "A Critical Success";
+            case ActionResult.PartlySuccess: return "A Partial Success";
+            case ActionResult.PartlyFailure: return "A Partial Failure";
+            case ActionResult.Fumble: return "A Fumble";
+            default: return "";
+        }
+    }
+
+    DiceRoller.RollType GetModifiedRollType(DiceRoller.RollType baseType, bool isAttack)
+    {
+        // Check player status effects
+        if (currentActingPlayer.hasAdvantageNextRoll)
+        {
+            return DiceRoller.RollType.Advantage;
+        }
+        if (currentActingPlayer.hasDisadvantageNextRoll)
+        {
+            return DiceRoller.RollType.Disadvantage;
+        }
+        if (isAttack && currentActingPlayer.hasAdvantageNextAttack)
+        {
+            return DiceRoller.RollType.Advantage;
+        }
+        if (isAttack && currentActingPlayer.hasDisadvantageNextAttack)
+        {
+            return DiceRoller.RollType.Disadvantage;
+        }
+        if (!isAttack && currentActingPlayer.hasAdvantageNextDefense)
+        {
+            return DiceRoller.RollType.Advantage;
+        }
+        if (!isAttack && currentActingPlayer.hasDisadvantageNextDefense)
+        {
+            return DiceRoller.RollType.Disadvantage;
+        }
+
+        return baseType;
+    }
+
+    void ShowActionResultSelection()
+    {
+        selectingActionResult = true;
+
+        // Clear existing result buttons
+        foreach (var btn in actionResultButtons)
+        {
+            if (btn != null) Destroy(btn.gameObject);
+        }
+        actionResultButtons.Clear();
+
+        // Find matching action results
+        List<PlayerActionResult> matchingResults = ActionResolver.Instance.allActionResults
+            .Where(r => r.AppliesTo(currentAction, currentResult))
+            .ToList();
+
+        if (matchingResults.Count == 0)
+        {
+            Debug.LogWarning($"No results found for {currentAction.actionName} with {currentResult}");
+            ContinueCombat();
+            return;
+        }
+
+        // Create result buttons
+        for (int i = 0; i < matchingResults.Count; i++)
+        {
+            GameObject btnObj = Instantiate(actionResultButtonPrefab, actionResultListContainer);
+            ActionResultButton resultBtn = btnObj.GetComponent<ActionResultButton>();
+            resultBtn.Initialize(i + 1, matchingResults[i], OnActionResultSelected);
+            resultBtn.SetSelectable(true);
+            actionResultButtons.Add(resultBtn);
+        }
+
+        actionResultListContainer.parent.gameObject.SetActive(true);
+    }
+
+    void OnActionResultSelected(PlayerActionResult selectedResult)
+    {
+        selectingActionResult = false;
+
+        // Hide result list
+        actionResultListContainer.parent.gameObject.SetActive(false);
+
+        // Disable result buttons
+        foreach (var btn in actionResultButtons)
+        {
+            btn.SetSelectable(false);
+        }
+
+        // Execute outcomes
+        ExecuteOutcomes(selectedResult);
+    }
+
+    void ExecuteOutcomes(PlayerActionResult result)
+    {
+        encounterText.text += $"\n\n{result.buttonText}:";
+
+        foreach (var outcome in result.outcomes)
+        {
+            ExecuteOutcome(outcome, result);
+        }
+
+        // Clear temporary status effects used in this action
+        ClearTemporaryStatusEffects();
+
+        // Update UI
+        UpdateCharacterButtons();
+        UpdateMonsterDisplay();
+
+        // Check if combat should end
+        if (activeMonsters.Count == 0)
+        {
+            EndCombat(true);
+            return;
+        }
+
+        List<PlayerCharacter> alivePlayers = partyMembers.Where(p => p != null && p.healthPoints > 0).ToList();
+        if (alivePlayers.Count == 0)
+        {
+            EndCombat(false);
+            return;
+        }
+
+        // Continue combat
+        waitingForSpace = true;
+        onSpacePressed = () => StartMonsterTurn();
+        encounterText.text += $"\n\nPress SPACE to continue...";
+    }
+
+    void ExecuteOutcome(ActionOutcome outcome, PlayerActionResult result)
+    {
+        switch (outcome)
+        {
+            case ActionOutcome.DealNormalDamage:
+                currentTarget.TakeDamage(result.damageAmount);
+                encounterText.text += $"\n{currentTarget.monsterName} suffers {result.damageAmount} damage";
+                break;
+
+            case ActionOutcome.DealDoubleDamage:
+                currentTarget.TakeDamage(result.damageAmount * 2);
+                encounterText.text += $"\n{currentTarget.monsterName} suffers {result.damageAmount * 2} damage";
+                break;
+
+            case ActionOutcome.DealTripleDamage:
+                currentTarget.TakeDamage(result.damageAmount * 3);
+                encounterText.text += $"\n{currentTarget.monsterName} suffers {result.damageAmount * 3} damage";
+                break;
+
+            case ActionOutcome.TakeDamage:
+                currentActingPlayer.TakeDamage(result.damageAmount);
+                encounterText.text += $"\n{currentActingPlayer.characterName} suffers {result.damageAmount} damage";
+                break;
+
+            case ActionOutcome.GainAdvantageNextRoll:
+                currentActingPlayer.hasAdvantageNextRoll = true;
+                break;
+
+            case ActionOutcome.GainDisadvantageNextRoll:
+                currentActingPlayer.hasDisadvantageNextRoll = true;
+                break;
+
+            case ActionOutcome.GainAdvantageNextAttack:
+                currentActingPlayer.hasAdvantageNextAttack = true;
+                break;
+
+            case ActionOutcome.GainDisadvantageNextAttack:
+                currentActingPlayer.hasDisadvantageNextAttack = true;
+                break;
+
+            case ActionOutcome.GainAdvantageNextDefense:
+                currentActingPlayer.hasAdvantageNextDefense = true;
+                break;
+
+            case ActionOutcome.GainDisadvantageNextDefense:
+                currentActingPlayer.hasDisadvantageNextDefense = true;
+                break;
+
+            case ActionOutcome.StunEnemy:
+                currentTarget.isTaunted = true;
+                currentTarget.tauntedBy = currentActingPlayer;
+                encounterText.text += $"\n{currentTarget.monsterName} is taunted by {currentActingPlayer.characterName}";
+                break;
+
+                // Add more outcomes as needed
+        }
+    }
+
+    void ClearTemporaryStatusEffects()
+    {
+        // Clear single-use status effects
+        currentActingPlayer.hasAdvantageNextRoll = false;
+        currentActingPlayer.hasDisadvantageNextRoll = false;
+        currentActingPlayer.hasAdvantageNextAttack = false;
+        currentActingPlayer.hasDisadvantageNextAttack = false;
+        currentActingPlayer.hasAdvantageNextDefense = false;
+        currentActingPlayer.hasDisadvantageNextDefense = false;
     }
 
     void StartMonsterTurn()
@@ -286,16 +655,23 @@ public class CombatManager : MonoBehaviour
         currentActiveMonsterIndex = activeMonsters.IndexOf(attackingMonster);
         UpdateMonsterDisplay();
 
-        // Pick random alive player
-        List<PlayerCharacter> alivePlayers = partyMembers.Where(p => p != null && p.healthPoints > 0).ToList();
-
-        if (alivePlayers.Count == 0)
+        // Pick target based on taunt
+        PlayerCharacter target;
+        if (attackingMonster.isTaunted && attackingMonster.tauntedBy != null && attackingMonster.tauntedBy.healthPoints > 0)
         {
-            EndCombat(false);
-            return;
+            target = attackingMonster.tauntedBy;
+        }
+        else
+        {
+            List<PlayerCharacter> alivePlayers = partyMembers.Where(p => p != null && p.healthPoints > 0).ToList();
+            if (alivePlayers.Count == 0)
+            {
+                EndCombat(false);
+                return;
+            }
+            target = alivePlayers[Random.Range(0, alivePlayers.Count)];
         }
 
-        PlayerCharacter target = alivePlayers[Random.Range(0, alivePlayers.Count)];
         target.TakeDamage(1);
 
         encounterText.text = $"{attackingMonster.monsterName} attacks {target.characterName} for 1 damage! Press SPACE to continue.";
@@ -314,13 +690,22 @@ public class CombatManager : MonoBehaviour
         }
     }
 
+    void ContinueCombat()
+    {
+        StartMonsterTurn();
+    }
+
     void EndCombat(bool playerVictory)
     {
         waitingForSpace = false;
         selectingMonster = false;
+        selectingAction = false;
+        selectingActionResult = false;
         isInCombat = false;
 
         monsterListUI.SetActive(false);
+        actionListContainer.parent.gameObject.SetActive(false);
+        actionResultListContainer.parent.gameObject.SetActive(false);
         encounterImage.gameObject.SetActive(false);
 
         // Clean up monster instances
@@ -329,6 +714,21 @@ public class CombatManager : MonoBehaviour
             if (monster != null) Destroy(monster.gameObject);
         }
         activeMonsters.Clear();
+
+        // Reset all status effects
+        foreach (var player in partyMembers)
+        {
+            if (player != null)
+            {
+                player.hasActedThisCycle = false;
+                player.hasAdvantageNextRoll = false;
+                player.hasDisadvantageNextRoll = false;
+                player.hasAdvantageNextAttack = false;
+                player.hasDisadvantageNextAttack = false;
+                player.hasAdvantageNextDefense = false;
+                player.hasDisadvantageNextDefense = false;
+            }
+        }
 
         if (playerVictory)
         {
@@ -348,12 +748,8 @@ public class CombatManager : MonoBehaviour
     {
         waitingForSpace = false;
         selectingMonster = false;
-
-        // Reset player acted flags
-        foreach (var player in partyMembers)
-        {
-            if (player != null) player.hasActedThisCycle = false;
-        }
+        selectingAction = false;
+        selectingActionResult = false;
 
         if (GameUIManager.Instance != null)
         {

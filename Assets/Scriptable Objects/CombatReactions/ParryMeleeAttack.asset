@@ -1,0 +1,27 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 6857da7c710c58a4596ad57aa813663f, type: 3}
+  m_Name: ParryMeleeAttack
+  m_EditorClassIdentifier: 
+  actionName: 
+  buttonText: 
+  description: 
+  triggerType: 0
+  successCheckAttribute: 0
+  criticalCheckAttribute: 0
+  fumbleCheckAttribute: 0
+  successRollType: 0
+  criticalRollType: 0
+  fumbleRollType: 0
+  targetSelectionText: Which enemy does {CHARACTER} want to target?
+  actionVerb: attacking
+  characterPronoun: They

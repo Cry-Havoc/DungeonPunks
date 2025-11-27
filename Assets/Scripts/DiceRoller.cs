@@ -52,36 +52,6 @@ public class DiceRoller : MonoBehaviour
         }
     }
 
-    void Update()
-    {
-        // Press SPACE to test normal roll
-        if (Input.GetKeyDown(KeyCode.Space) && !isRolling)
-        {
-            RollForSkillCheck(50, RollType.Normal, (result) =>
-            {
-                Debug.Log($"=== DICE ROLL RESULT: {result} ===");
-            });
-        }
-
-        // Press A for Advantage test
-        if (Input.GetKeyDown(KeyCode.A) && !isRolling)
-        {
-            RollForSkillCheck(50, RollType.Advantage, (result) =>
-            {
-                Debug.Log($"=== ADVANTAGE ROLL RESULT: {result} ===");
-            });
-        }
-
-        // Press D for Disadvantage test
-        if (Input.GetKeyDown(KeyCode.D) && !isRolling)
-        {
-            RollForSkillCheck(50, RollType.Disadvantage, (result) =>
-            {
-                Debug.Log($"=== DISADVANTAGE ROLL RESULT: {result} ===");
-            });
-        }
-    }
-
     /// <summary>
     /// Rolls for a skill check with advantage/disadvantage
     /// </summary>
@@ -223,8 +193,8 @@ public class DiceRoller : MonoBehaviour
 
         if (currentRollType == RollType.Disadvantage)
         {
-            // Lower number gets red
-            if (tensActual < onesActual)
+            // Higher number gets red
+            if (tensActual > onesActual)
             {
                 tensDigitDie.SetMaterial(redMaterial);
                 onesDigitDie.SetMaterial(whiteMaterial);
@@ -235,8 +205,8 @@ public class DiceRoller : MonoBehaviour
                 onesDigitDie.SetMaterial(redMaterial);
             }
 
-            // If lower is on right (ones), swap
-            if (onesActual < tensActual)
+            // If higher is on right (ones), swap to bring it to front
+            if (onesActual > tensActual)
             {
                 needSwap = true;
                 if (rollResultText != null)
@@ -248,8 +218,8 @@ public class DiceRoller : MonoBehaviour
         }
         else if (currentRollType == RollType.Advantage)
         {
-            // Higher number gets blue
-            if (tensActual > onesActual)
+            // Lower number gets blue
+            if (tensActual < onesActual)
             {
                 tensDigitDie.SetMaterial(blueMaterial);
                 onesDigitDie.SetMaterial(whiteMaterial);
@@ -260,8 +230,8 @@ public class DiceRoller : MonoBehaviour
                 onesDigitDie.SetMaterial(blueMaterial);
             }
 
-            // If higher is on right (ones), swap
-            if (onesActual > tensActual)
+            // If lower is on right (ones), swap to bring it to front
+            if (onesActual < tensActual)
             {
                 needSwap = true;
                 if (rollResultText != null)

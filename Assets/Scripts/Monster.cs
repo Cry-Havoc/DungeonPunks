@@ -10,6 +10,10 @@ public class Monster : MonoBehaviour
     [HideInInspector] public int currentHealthPoints;
     [HideInInspector] public bool hasActedThisCycle = false;
 
+    // Taunt tracking
+    [HideInInspector] public bool isTaunted = false;
+    [HideInInspector] public PlayerCharacter tauntedBy = null;
+
     void Awake()
     {
         currentHealthPoints = maxHealthPoints;

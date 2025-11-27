@@ -23,16 +23,37 @@ public class Die : MonoBehaviour
     private int targetValue = -1;
     private bool isRolling = false;
     private Coroutine rollCoroutine;
+    private MeshRenderer meshRenderer;
 
     void Awake()
     {
         rb = GetComponent<Rigidbody>();
+        meshRenderer = GetComponent<MeshRenderer>();
         originalPosition = transform.position;
         originalRotation = transform.rotation;
 
         // Make sure rigidbody is set up correctly
         rb.useGravity = false;
         rb.isKinematic = true;
+    }
+
+    /// <summary>
+    /// Sets the material of the die
+    /// </summary>
+    public void SetMaterial(Material material)
+    {
+        if (meshRenderer != null && material != null)
+        {
+            meshRenderer.material = material;
+        }
+    }
+
+    /// <summary>
+    /// Updates the original position (used after swapping)
+    /// </summary>
+    public void SetOriginalPosition(Vector3 newPosition)
+    {
+        originalPosition = newPosition;
     }
 
     /// <summary>

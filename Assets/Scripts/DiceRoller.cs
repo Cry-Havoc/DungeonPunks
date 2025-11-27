@@ -1,4 +1,6 @@
 using UnityEngine;
+using UnityEngine.UI;
+using TMPro;
 using System.Collections;
 using System;
 
@@ -13,11 +15,30 @@ public class DiceRoller : MonoBehaviour
     [Header("Roll Settings")]
     public float rollDuration = 2f;
     public float settleTime = 0.5f;
+    public float swapAnimationDuration = 0.5f;
+
+    [Header("UI References")]
+    public TextMeshProUGUI rollResultText;
+
+    [Header("Dice Materials")]
+    public Material whiteMaterial;
+    public Material redMaterial;
+    public Material blueMaterial;
+    public Material greenMaterial;
 
     private bool isRolling = false;
     private Action<int> onRollComplete;
+    private RollType currentRollType = RollType.Normal;
+    private int currentSkillValue = 50;
 
     public bool IsRolling => isRolling;
+
+    public enum RollType
+    {
+        Normal,
+        Advantage,
+        Disadvantage
+    }
 
     void Awake()
     {
@@ -33,21 +54,41 @@ public class DiceRoller : MonoBehaviour
 
     void Update()
     {
-        // Press SPACE to test roll
+        // Press SPACE to test normal roll
         if (Input.GetKeyDown(KeyCode.Space) && !isRolling)
         {
-            RollForSkillCheck((result) =>
+            RollForSkillCheck(50, RollType.Normal, (result) =>
             {
                 Debug.Log($"=== DICE ROLL RESULT: {result} ===");
+            });
+        }
+
+        // Press A for Advantage test
+        if (Input.GetKeyDown(KeyCode.A) && !isRolling)
+        {
+            RollForSkillCheck(50, RollType.Advantage, (result) =>
+            {
+                Debug.Log($"=== ADVANTAGE ROLL RESULT: {result} ===");
+            });
+        }
+
+        // Press D for Disadvantage test
+        if (Input.GetKeyDown(KeyCode.D) && !isRolling)
+        {
+            RollForSkillCheck(50, RollType.Disadvantage, (result) =>
+            {
+                Debug.Log($"=== DISADVANTAGE ROLL RESULT: {result} ===");
             });
         }
     }
 
     /// <summary>
-    /// Rolls two d10 dice to generate a number from 1-100
+    /// Rolls for a skill check with advantage/disadvantage
     /// </summary>
-    /// <param name="callback">Called when roll is complete with the result (1-100)</param>
-    public void RollForSkillCheck(Action<int> callback)
+    /// <param name="skillValue">Target skill value (1-100) to beat</param>
+    /// <param name="rollType">Normal, Advantage, or Disadvantage</param>
+    /// <param name="callback">Called with final result after all animations</param>
+    public void RollForSkillCheck(int skillValue, RollType rollType, Action<int> callback)
     {
         if (isRolling)
         {
@@ -55,27 +96,29 @@ public class DiceRoller : MonoBehaviour
             return;
         }
 
+        currentSkillValue = skillValue;
+        currentRollType = rollType;
         StartCoroutine(PerformRoll(callback));
     }
 
     /// <summary>
-    /// Rolls dice for a predetermined result
+    /// Rolls dice for a predetermined result with roll type
     /// </summary>
-    /// <param name="targetResult">The desired result (1-100)</param>
-    /// <param name="callback">Called when roll is complete</param>
-    public void RollForPredeterminedResult(int targetResult, Action<int> callback)
+    public void RollForPredeterminedResult(int targetResult, int skillValue, RollType rollType, Action<int> callback)
     {
         if (isRolling)
         {
             Debug.LogWarning("Dice are already rolling!");
             return;
         }
+
+        currentSkillValue = skillValue;
+        currentRollType = rollType;
 
         // Convert target result to two dice values
         int tens = (targetResult / 10) % 10;
         int ones = targetResult % 10;
 
-        // Handle special case: 100 should be 0,0 on dice (representing 10,10)
         if (targetResult == 100)
         {
             tens = 0;
@@ -90,9 +133,19 @@ public class DiceRoller : MonoBehaviour
         isRolling = true;
         onRollComplete = callback;
 
+        // Clear text
+        if (rollResultText != null)
+        {
+            rollResultText.text = "";
+        }
+
+        // Set both dice to white initially
+        tensDigitDie.SetMaterial(whiteMaterial);
+        onesDigitDie.SetMaterial(whiteMaterial);
+
         // Generate random predetermined values
-        int tensValue = UnityEngine.Random.Range(0, 10); // 0-9 (0 represents 10)
-        int onesValue = UnityEngine.Random.Range(0, 10); // 0-9 (0 represents 10)
+        int tensValue = UnityEngine.Random.Range(0, 10);
+        int onesValue = UnityEngine.Random.Range(0, 10);
 
         // Start both dice rolling
         tensDigitDie.RollToValue(tensValue, rollDuration);
@@ -101,11 +154,13 @@ public class DiceRoller : MonoBehaviour
         // Wait for roll to complete
         yield return new WaitForSeconds(rollDuration + settleTime);
 
-        // Calculate final result (1-100)
-        int result = CalculateResult(tensValue, onesValue);
+        // Calculate initial result
+        int initialResult = CalculateResult(tensValue, onesValue);
+
+        // Apply advantage/disadvantage logic
+        yield return StartCoroutine(HandleAdvantageDisadvantage(tensValue, onesValue, initialResult));
 
         isRolling = false;
-        onRollComplete?.Invoke(result);
     }
 
     IEnumerator PerformPredeterminedRoll(int tensValue, int onesValue, Action<int> callback)
@@ -113,6 +168,16 @@ public class DiceRoller : MonoBehaviour
         isRolling = true;
         onRollComplete = callback;
 
+        // Clear text
+        if (rollResultText != null)
+        {
+            rollResultText.text = "";
+        }
+
+        // Set both dice to white initially
+        tensDigitDie.SetMaterial(whiteMaterial);
+        onesDigitDie.SetMaterial(whiteMaterial);
+
         // Start both dice rolling
         tensDigitDie.RollToValue(tensValue, rollDuration);
         onesDigitDie.RollToValue(onesValue, rollDuration);
@@ -120,48 +185,185 @@ public class DiceRoller : MonoBehaviour
         // Wait for roll to complete
         yield return new WaitForSeconds(rollDuration + settleTime);
 
-        // Calculate final result
-        int result = CalculateResult(tensValue, onesValue);
+        // Calculate initial result
+        int initialResult = CalculateResult(tensValue, onesValue);
+
+        // Apply advantage/disadvantage logic
+        yield return StartCoroutine(HandleAdvantageDisadvantage(tensValue, onesValue, initialResult));
 
         isRolling = false;
-        onRollComplete?.Invoke(result);
+    }
+
+    IEnumerator HandleAdvantageDisadvantage(int tensValue, int onesValue, int initialResult)
+    {
+        int tensActual = (tensValue == 0) ? 10 : tensValue;
+        int onesActual = (onesValue == 0) ? 10 : onesValue;
+
+        // Check for mirror dice
+        if (tensActual == onesActual)
+        {
+            tensDigitDie.SetMaterial(greenMaterial);
+            onesDigitDie.SetMaterial(greenMaterial);
+
+            bool mirrorSuccess = initialResult <= currentSkillValue;
+            string mirrorSuccessText = mirrorSuccess ? "Success" : "Failure";
+            Color mirrorSuccessColor = mirrorSuccess ? Color.blue : Color.red;
+
+            if (rollResultText != null)
+            {
+                rollResultText.text = $"<color=green>Mirror Dice</color>\n<color=#{ColorUtility.ToHtmlStringRGB(mirrorSuccessColor)}>{mirrorSuccessText}</color>";
+            }
+
+            onRollComplete?.Invoke(initialResult);
+            yield break;
+        }
+
+        int finalResult = initialResult;
+        bool needSwap = false;
+
+        if (currentRollType == RollType.Disadvantage)
+        {
+            // Lower number gets red
+            if (tensActual < onesActual)
+            {
+                tensDigitDie.SetMaterial(redMaterial);
+                onesDigitDie.SetMaterial(whiteMaterial);
+            }
+            else
+            {
+                tensDigitDie.SetMaterial(whiteMaterial);
+                onesDigitDie.SetMaterial(redMaterial);
+            }
+
+            // If lower is on right (ones), swap
+            if (onesActual < tensActual)
+            {
+                needSwap = true;
+                if (rollResultText != null)
+                {
+                    rollResultText.text = "Disadvantage";
+                    rollResultText.color = Color.red;
+                }
+            }
+        }
+        else if (currentRollType == RollType.Advantage)
+        {
+            // Higher number gets blue
+            if (tensActual > onesActual)
+            {
+                tensDigitDie.SetMaterial(blueMaterial);
+                onesDigitDie.SetMaterial(whiteMaterial);
+            }
+            else
+            {
+                tensDigitDie.SetMaterial(whiteMaterial);
+                onesDigitDie.SetMaterial(blueMaterial);
+            }
+
+            // If higher is on right (ones), swap
+            if (onesActual > tensActual)
+            {
+                needSwap = true;
+                if (rollResultText != null)
+                {
+                    rollResultText.text = "Advantage";
+                    rollResultText.color = Color.blue;
+                }
+            }
+        }
+
+        // Perform swap animation if needed
+        if (needSwap)
+        {
+            yield return new WaitForSeconds(0.5f); // Brief pause before swap
+            yield return StartCoroutine(SwapDiceAnimation());
+
+            // Calculate swapped result
+            finalResult = CalculateResult(onesValue, tensValue);
+        }
+
+        // Add success/failure text
+        bool finalSuccess = finalResult <= currentSkillValue;
+        string finalSuccessText = finalSuccess ? "Success" : "Failure";
+        Color finalSuccessColor = finalSuccess ? Color.blue : Color.red;
+
+        if (rollResultText != null)
+        {
+            if (currentRollType == RollType.Normal)
+            {
+                rollResultText.text = finalSuccessText;
+                rollResultText.color = finalSuccessColor;
+            }
+            else
+            {
+                string advantageText = currentRollType == RollType.Advantage ? "Advantage" : "Disadvantage";
+                Color advantageColor = currentRollType == RollType.Advantage ? Color.blue : Color.red;
+
+                rollResultText.text = $"<color=#{ColorUtility.ToHtmlStringRGB(advantageColor)}>{advantageText}</color>\n<color=#{ColorUtility.ToHtmlStringRGB(finalSuccessColor)}>{finalSuccessText}</color>";
+            }
+        }
+
+        onRollComplete?.Invoke(finalResult);
+    }
+
+    IEnumerator SwapDiceAnimation()
+    {
+        Vector3 tensStart = tensDigitDie.transform.position;
+        Vector3 onesStart = onesDigitDie.transform.position;
+
+        Quaternion tensRotStart = tensDigitDie.transform.rotation;
+        Quaternion onesRotStart = onesDigitDie.transform.rotation;
+
+        float elapsed = 0f;
+
+        while (elapsed < swapAnimationDuration)
+        {
+            elapsed += Time.deltaTime;
+            float t = elapsed / swapAnimationDuration;
+
+            // Use ease-in-out for smooth animation
+            float smoothT = Mathf.SmoothStep(0, 1, t);
+
+            // Swap positions with arc
+            float arcHeight = 1f;
+            Vector3 arcOffset = Vector3.up * Mathf.Sin(t * Mathf.PI) * arcHeight;
+
+            tensDigitDie.transform.position = Vector3.Lerp(tensStart, onesStart, smoothT) + arcOffset;
+            onesDigitDie.transform.position = Vector3.Lerp(onesStart, tensStart, smoothT) + arcOffset;
+
+            // Swap rotations
+            tensDigitDie.transform.rotation = Quaternion.Slerp(tensRotStart, onesRotStart, smoothT);
+            onesDigitDie.transform.rotation = Quaternion.Slerp(onesRotStart, tensRotStart, smoothT);
+
+            yield return null;
+        }
+
+        // Ensure final positions are exact
+        tensDigitDie.transform.position = onesStart;
+        onesDigitDie.transform.position = tensStart;
+        tensDigitDie.transform.rotation = onesRotStart;
+        onesDigitDie.transform.rotation = tensRotStart;
+
+        // Update original positions in Die scripts
+        tensDigitDie.SetOriginalPosition(onesStart);
+        onesDigitDie.SetOriginalPosition(tensStart);
+
+        // Swap the die references
+        Die temp = tensDigitDie;
+        tensDigitDie = onesDigitDie;
+        onesDigitDie = temp;
     }
 
     int CalculateResult(int tens, int ones)
     {
-        // Convert dice values to result
-        // 0 on die represents 10
         int tensDigit = (tens == 0) ? 10 : tens;
         int onesDigit = (ones == 0) ? 10 : ones;
 
         int result = (tensDigit * 10) + onesDigit;
 
-        // Handle edge cases
         if (result > 100) result = 100;
         if (result < 1) result = 1;
 
         return result;
-    }
-
-    /// <summary>
-    /// Test method to roll dice from anywhere
-    /// </summary>
-    public void TestRoll()
-    {
-        RollForSkillCheck((result) =>
-        {
-            Debug.Log($"Dice rolled: {result}");
-        });
-    }
-
-    /// <summary>
-    /// Test method for predetermined roll
-    /// </summary>
-    public void TestPredeterminedRoll(int target)
-    {
-        RollForPredeterminedResult(target, (result) =>
-        {
-            Debug.Log($"Dice rolled predetermined: {result}");
-        });
     }
 }

@@ -118,7 +118,11 @@ public class ActionResolver : MonoBehaviour
         bool rollComplete = false;
         int rollResult = 0;
 
-        DiceRoller.Instance.RollForSkillCheck(targetValue, rollType, (result) => {
+        // Convert RollType to advantage/disadvantage counts
+        int advantageCount = rollType == DiceRoller.RollType.Advantage ? 1 : 0;
+        int disadvantageCount = rollType == DiceRoller.RollType.Disadvantage ? 1 : 0;
+
+        DiceRoller.Instance.RollForSkillCheck(targetValue, advantageCount, disadvantageCount, (result) => {
             rollResult = result;
             rollComplete = true;
         });

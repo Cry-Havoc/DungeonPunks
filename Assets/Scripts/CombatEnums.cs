@@ -70,5 +70,18 @@ public enum ActionOutcome
     DrawEnemyAttention,
     DefendAlly,
     BreakWeapon,
+    TauntAllEnemies,
+    TauntEnemy,
+    EnemyIsAttackedWithDisadvantage,
+    EnemyIsAttackedWithAdvantage,
+    EnemyAttacksAreDefendedWithDisadvantage,
+    EnemyAttacksAreDefendedWithAdvantage,
+    GainDisadvantageNextDefense,
+    GainAdvantageNextDefense,
+    GainDisadvantageNextAttack,
+    GainAdvantageNextAttack,
+    DealDamageToAlly,
+    TakeExhaustionDamage,
+
     Nothing
 }

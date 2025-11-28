@@ -14,6 +14,12 @@ public class Monster : MonoBehaviour
     [HideInInspector] public bool isTaunted = false;
     [HideInInspector] public PlayerCharacter tauntedBy = null;
 
+    // Combat status effects
+    [HideInInspector] public int advantageWhenDefendedAgainstCount = 0;
+    [HideInInspector] public int disadvantageWhenDefendedAgainstCount = 0;
+    [HideInInspector] public int advantageWhenAttackedCount = 0;
+    [HideInInspector] public int disadvantageWhenAttackedCount = 0;
+
     void Awake()
     {
         currentHealthPoints = maxHealthPoints;

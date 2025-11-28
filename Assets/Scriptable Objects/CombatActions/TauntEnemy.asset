@@ -24,4 +24,3 @@ MonoBehaviour:
   fumbleRollType: 0
   targetSelectionText: Which enemy does {CHARACTER} want to taunt?
   actionVerb: taunting
-  characterPronoun: They

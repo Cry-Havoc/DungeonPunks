@@ -12,7 +12,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 37d9a57950e02934fbdf4a74f6c45b7c, type: 3}
   m_Name: Unwanted Attention
   m_EditorClassIdentifier: 
-  resultName: Taunted Enemy
+  resultName: Unwanted Attention
+  buttonText: Unwanted Attention
   description: 
   resultTypes:
   - action: {fileID: 11400000, guid: 90cce6a76e214d8469dc01431c5e22d1, type: 2}

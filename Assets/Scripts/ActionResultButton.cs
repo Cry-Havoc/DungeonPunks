@@ -27,7 +27,7 @@ public class ActionResultButton : MonoBehaviour, IPointerClickHandler, IPointerE
         }
     }
 
-    public void Initialize(int number, PlayerActionResult result, System.Action<PlayerActionResult> callback)
+    public void InitializeResultButton(int number, PlayerActionResult result, System.Action<PlayerActionResult> callback)
     {
         resultNumber = number;
         actionResult = result;

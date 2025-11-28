@@ -1,8 +1,9 @@
-using UnityEngine;
-using UnityEngine.UI;
-using TMPro;
 using System.Collections.Generic;
 using System.Linq;
+using TMPro;
+using UnityEngine;
+using UnityEngine.UI;
+using static DiceRoller;
 
 public class CombatManager : MonoBehaviour
 {
@@ -245,7 +246,7 @@ public class CombatManager : MonoBehaviour
         {
             GameObject btnObj = Instantiate(actionButtonPrefab, actionListContainer);
             ActionButton actionBtn = btnObj.GetComponent<ActionButton>();
-            actionBtn.Initialize(i + 1, availableActiveCombatActions[i], currentActingPlayer, OnActionSelected);
+            actionBtn.InitializeActionButton(i + 1, availableActiveCombatActions[i], currentActingPlayer, OnActionSelected);
             actionBtn.SetSelectable(true);
             actionButtons.Add(actionBtn);
         }
@@ -259,7 +260,8 @@ public class CombatManager : MonoBehaviour
         currentAction = action;
 
         // Hide action list
-        actionListContainer.parent.gameObject.SetActive(false);
+        //actionListContainer.parent.gameObject.SetActive(false);
+        actionListContainer.gameObject.SetActive(false);
 
         // Disable action buttons
         foreach (var btn in actionButtons)
@@ -325,7 +327,7 @@ public class CombatManager : MonoBehaviour
         string successAttr = currentAction.GetAttributeName(currentAction.successCheckAttribute);
 
         // Apply advantage/disadvantage if player has status effects
-        DiceRoller.RollType successRollType = GetModifiedRollType(currentAction.successRollType, true);
+        DiceRoller.RollTypeData successRollType = GetModifiedRollType(currentAction.successRollType, true);
 
         encounterText.text += $"\nRoll lower than {successAttr} ({successValue})...";
 
@@ -333,7 +335,7 @@ public class CombatManager : MonoBehaviour
         int successRoll = 0;
 
         bool rollComplete = false;
-        DiceRoller.Instance.RollForSkillCheck(successValue, successRollType, (result) => {
+        DiceRoller.Instance.RollForSkillCheck(successValue, successRollType.advantages, successRollType.disadvantage, (result) => {
             successRoll = result;
             successPassed = result <= successValue;
             rollComplete = true;
@@ -341,7 +343,7 @@ public class CombatManager : MonoBehaviour
 
         while (!rollComplete) yield return null;
 
-        string rollTypeText = GetRollTypeText(successRollType);
+        string rollTypeText = GetRollTypeText(successRollType.rollType);
         encounterText.text += $"\nRoll lower than {successAttr} ({successValue}) - ROLLED {successRoll} {rollTypeText}";
         encounterText.text += $"\n{currentActingPlayer.characterPronoun} is {(successPassed ? "successful" : "unsuccessful")}...";
 
@@ -353,7 +355,7 @@ public class CombatManager : MonoBehaviour
             // Critical Check
             int criticalValue = currentAction.GetAttributeValue(currentActingPlayer, currentAction.criticalCheckAttribute);
             string criticalAttr = currentAction.GetAttributeName(currentAction.criticalCheckAttribute);
-            DiceRoller.RollType criticalRollType = GetModifiedRollType(currentAction.criticalRollType, true);
+            DiceRoller.RollTypeData criticalRollType = GetModifiedRollType(currentAction.criticalRollType, true);
 
             encounterText.text += $"\n\nFor a Critical Success roll lower than {criticalAttr} ({criticalValue})...";
 
@@ -361,7 +363,7 @@ public class CombatManager : MonoBehaviour
             int criticalRoll = 0;
 
             rollComplete = false;
-            DiceRoller.Instance.RollForSkillCheck(criticalValue, criticalRollType, (result) => {
+            DiceRoller.Instance.RollForSkillCheck(criticalValue, criticalRollType.advantages, criticalRollType.disadvantage, (result) => {
                 criticalRoll = result;
                 criticalPassed = result <= criticalValue;
                 rollComplete = true;
@@ -369,7 +371,7 @@ public class CombatManager : MonoBehaviour
 
             while (!rollComplete) yield return null;
 
-            rollTypeText = GetRollTypeText(criticalRollType);
+            rollTypeText = GetRollTypeText(criticalRollType.rollType);
             encounterText.text += $"\nRoll lower than {criticalAttr} ({criticalValue}) - ROLLED {criticalRoll} {rollTypeText}";
 
             currentResult = criticalPassed ? ActionResult.CriticalSuccess : ActionResult.PartlySuccess;
@@ -379,7 +381,7 @@ public class CombatManager : MonoBehaviour
             // Fumble Check
             int fumbleValue = currentAction.GetAttributeValue(currentActingPlayer, currentAction.fumbleCheckAttribute);
             string fumbleAttr = currentAction.GetAttributeName(currentAction.fumbleCheckAttribute);
-            DiceRoller.RollType fumbleRollType = GetModifiedRollType(currentAction.fumbleRollType, false);
+            DiceRoller.RollTypeData fumbleRollType = GetModifiedRollType(currentAction.fumbleRollType, false);
 
             encounterText.text += $"\n\nTo avoid a Fumble roll lower than {fumbleAttr} ({fumbleValue})...";
 
@@ -387,7 +389,7 @@ public class CombatManager : MonoBehaviour
             int fumbleRoll = 0;
 
             rollComplete = false;
-            DiceRoller.Instance.RollForSkillCheck(fumbleValue, fumbleRollType, (result) => {
+            DiceRoller.Instance.RollForSkillCheck(fumbleValue, fumbleRollType.advantages, fumbleRollType.disadvantage, (result) => {
                 fumbleRoll = result;
                 fumblePassed = result <= fumbleValue;
                 rollComplete = true;
@@ -395,7 +397,7 @@ public class CombatManager : MonoBehaviour
 
             while (!rollComplete) yield return null;
 
-            rollTypeText = GetRollTypeText(fumbleRollType);
+            rollTypeText = GetRollTypeText(fumbleRollType.rollType);
             encounterText.text += $"\nRoll lower than {fumbleAttr} ({fumbleValue}) - ROLLED {fumbleRoll} {rollTypeText}";
 
             currentResult = fumblePassed ? ActionResult.PartlyFailure : ActionResult.Fumble;
@@ -431,35 +433,61 @@ public class CombatManager : MonoBehaviour
         }
     }
 
-    DiceRoller.RollType GetModifiedRollType(DiceRoller.RollType baseType, bool isAttack)
+    DiceRoller.RollTypeData GetModifiedRollType(DiceRoller.RollType baseType, bool isAttack)
     {
+        int countDisadvantages = 0;
+        int countAdvantages = 0;
+
         // Check player status effects
-        if (currentActingPlayer.hasAdvantageNextRoll)
+        if (currentActingPlayer.advantageCount > 0)
         {
-            return DiceRoller.RollType.Advantage;
+            currentActingPlayer.advantageCount--;
+            countAdvantages++;
         }
-        if (currentActingPlayer.hasDisadvantageNextRoll)
+        if (currentActingPlayer.disadvantageCount > 0)
         {
-            return DiceRoller.RollType.Disadvantage;
+            currentActingPlayer.disadvantageCount--;
+            countDisadvantages++;
         }
-        if (isAttack && currentActingPlayer.hasAdvantageNextAttack)
+        if (isAttack && currentActingPlayer.advantageAttackCount > 0)
         {
-            return DiceRoller.RollType.Advantage;
+            currentActingPlayer.advantageAttackCount--;
+            countAdvantages++;
         }
-        if (isAttack && currentActingPlayer.hasDisadvantageNextAttack)
+        if (isAttack && currentActingPlayer.disadvantageAttackCount > 0)
         {
-            return DiceRoller.RollType.Disadvantage;
+            currentActingPlayer.disadvantageAttackCount--;
+            countDisadvantages++;
         }
-        if (!isAttack && currentActingPlayer.hasAdvantageNextDefense)
+        if (!isAttack && currentActingPlayer.advantageDefenseCount > 0)
         {
-            return DiceRoller.RollType.Advantage;
+            currentActingPlayer.advantageDefenseCount--;
+            countAdvantages++;
         }
-        if (!isAttack && currentActingPlayer.hasDisadvantageNextDefense)
+        if (!isAttack && currentActingPlayer.disadvantageDefenseCount > 0)
         {
-            return DiceRoller.RollType.Disadvantage;
+            currentActingPlayer.disadvantageCount--;
+            countDisadvantages++;
         }
 
-        return baseType;
+        RollTypeData rollTypeData = new RollTypeData();
+
+        if (countDisadvantages > countAdvantages)
+        {
+            rollTypeData.rollType = DiceRoller.RollType.Disadvantage;
+        }
+        else if (countAdvantages > countDisadvantages)
+        {
+            rollTypeData.rollType = DiceRoller.RollType.Advantage; 
+        }
+        else
+        {
+            rollTypeData.rollType = baseType;
+        }
+
+        rollTypeData.advantages = countAdvantages;
+        rollTypeData.disadvantage = countDisadvantages;
+        return rollTypeData;
     }
 
     void ShowActionResultSelection()
@@ -490,7 +518,7 @@ public class CombatManager : MonoBehaviour
         {
             GameObject btnObj = Instantiate(actionResultButtonPrefab, actionResultListContainer);
             ActionResultButton resultBtn = btnObj.GetComponent<ActionResultButton>();
-            resultBtn.Initialize(i + 1, matchingResults[i], OnActionResultSelected);
+            resultBtn.InitializeResultButton(i + 1, matchingResults[i], OnActionResultSelected);
             resultBtn.SetSelectable(true);
             actionResultButtons.Add(resultBtn);
         }
@@ -503,7 +531,7 @@ public class CombatManager : MonoBehaviour
         selectingActionResult = false;
 
         // Hide result list
-        actionResultListContainer.parent.gameObject.SetActive(false);
+        actionResultListContainer.gameObject.SetActive(false);
 
         // Disable result buttons
         foreach (var btn in actionResultButtons)
@@ -556,53 +584,108 @@ public class CombatManager : MonoBehaviour
         switch (outcome)
         {
             case ActionOutcome.DealNormalDamage:
-                currentTarget.TakeDamage(result.damageAmount);
-                encounterText.text += $"\n{currentTarget.monsterName} suffers {result.damageAmount} damage";
+                currentTarget.TakeDamage(currentActingPlayer.damageAmount);
+                encounterText.text += $"\n{currentTarget.monsterName} suffers {currentActingPlayer.damageAmount} damage";
                 break;
 
             case ActionOutcome.DealDoubleDamage:
-                currentTarget.TakeDamage(result.damageAmount * 2);
-                encounterText.text += $"\n{currentTarget.monsterName} suffers {result.damageAmount * 2} damage";
+                currentTarget.TakeDamage(currentActingPlayer.damageAmount * 2);
+                encounterText.text += $"\n{currentTarget.monsterName} suffers {currentActingPlayer.damageAmount * 2} damage";
                 break;
 
             case ActionOutcome.DealTripleDamage:
-                currentTarget.TakeDamage(result.damageAmount * 3);
-                encounterText.text += $"\n{currentTarget.monsterName} suffers {result.damageAmount * 3} damage";
+                currentTarget.TakeDamage(currentActingPlayer.damageAmount * 3);
+                encounterText.text += $"\n{currentTarget.monsterName} suffers {currentActingPlayer.damageAmount * 3} damage";
                 break;
 
             case ActionOutcome.TakeDamage:
-                currentActingPlayer.TakeDamage(result.damageAmount);
-                encounterText.text += $"\n{currentActingPlayer.characterName} suffers {result.damageAmount} damage";
+                // Deals monster's damage (currently 1)
+                int monsterDamage = 1;
+                currentActingPlayer.TakeDamage(monsterDamage);
+                encounterText.text += $"\n{currentActingPlayer.characterName} suffers {monsterDamage} damage";
+                break;
+
+            case ActionOutcome.TakeExhaustionDamage:
+                // Escalating damage based on how many times chosen
+                currentActingPlayer.exhaustionDamageLevel++;
+                currentActingPlayer.TakeDamage(currentActingPlayer.exhaustionDamageLevel);
+                encounterText.text += $"\n{currentActingPlayer.characterName} suffers {currentActingPlayer.exhaustionDamageLevel} exhaustion damage";
+                break;
+
+            case ActionOutcome.DealDamageToAlly:
+                // Random ally takes player's damage
+                List<PlayerCharacter> otherAllies = partyMembers
+                    .Where(p => p != null && p != currentActingPlayer && p.healthPoints > 0)
+                    .ToList();
+
+                if (otherAllies.Count > 0)
+                {
+                    PlayerCharacter randomAlly = otherAllies[Random.Range(0, otherAllies.Count)];
+                    randomAlly.TakeDamage(currentActingPlayer.damageAmount);
+                    encounterText.text += $"\n{randomAlly.characterName} suffers {currentActingPlayer.damageAmount} damage";
+                }
                 break;
 
             case ActionOutcome.GainAdvantageNextRoll:
-                currentActingPlayer.hasAdvantageNextRoll = true;
+                currentActingPlayer.advantageCount++;
                 break;
 
             case ActionOutcome.GainDisadvantageNextRoll:
-                currentActingPlayer.hasDisadvantageNextRoll = true;
+                currentActingPlayer.disadvantageCount++;
                 break;
 
             case ActionOutcome.GainAdvantageNextAttack:
-                currentActingPlayer.hasAdvantageNextAttack = true;
+                currentActingPlayer.advantageAttackCount++;
                 break;
 
             case ActionOutcome.GainDisadvantageNextAttack:
-                currentActingPlayer.hasDisadvantageNextAttack = true;
+                currentActingPlayer.disadvantageAttackCount++;
                 break;
 
             case ActionOutcome.GainAdvantageNextDefense:
-                currentActingPlayer.hasAdvantageNextDefense = true;
+                currentActingPlayer.advantageDefenseCount++;
                 break;
 
             case ActionOutcome.GainDisadvantageNextDefense:
-                currentActingPlayer.hasDisadvantageNextDefense = true;
+                currentActingPlayer.disadvantageDefenseCount++;
                 break;
 
-            case ActionOutcome.StunEnemy:
+            case ActionOutcome.EnemyAttacksAreDefendedWithAdvantage:
+                currentTarget.advantageWhenDefendedAgainstCount++;
+                encounterText.text += $"\nDefending against {currentTarget.monsterName} gains advantage";
+                break;
+
+            case ActionOutcome.EnemyAttacksAreDefendedWithDisadvantage:
+                currentTarget.disadvantageWhenDefendedAgainstCount++;
+                encounterText.text += $"\nDefending against {currentTarget.monsterName} gets disadvantage";
+                break;
+
+            case ActionOutcome.EnemyIsAttackedWithAdvantage:
+                currentTarget.advantageWhenAttackedCount++;
+                encounterText.text += $"\nAttacking {currentTarget.monsterName} gains advantage";
+                break;
+
+            case ActionOutcome.EnemyIsAttackedWithDisadvantage:
+                currentTarget.disadvantageWhenAttackedCount++;
+                encounterText.text += $"\nAttacking {currentTarget.monsterName} gets disadvantage";
+                break;
+
+            case ActionOutcome.TauntEnemy:
                 currentTarget.isTaunted = true;
                 currentTarget.tauntedBy = currentActingPlayer;
                 encounterText.text += $"\n{currentTarget.monsterName} is taunted by {currentActingPlayer.characterName}";
+                break;
+
+            case ActionOutcome.TauntAllEnemies:
+                foreach (var monster in activeMonsters)
+                {
+                    if (monster != null && monster.IsAlive())
+                    {
+                        monster.isTaunted = true;
+                        monster.tauntedBy = currentActingPlayer;
+                    }
+                }
+                encounterText.text += $"\nAll enemies are taunted by {currentActingPlayer.characterName}";
                 break;
 
                 // Add more outcomes as needed
@@ -612,12 +695,17 @@ public class CombatManager : MonoBehaviour
     void ClearTemporaryStatusEffects()
     {
         // Clear single-use status effects
-        currentActingPlayer.hasAdvantageNextRoll = false;
-        currentActingPlayer.hasDisadvantageNextRoll = false;
-        currentActingPlayer.hasAdvantageNextAttack = false;
-        currentActingPlayer.hasDisadvantageNextAttack = false;
-        currentActingPlayer.hasAdvantageNextDefense = false;
-        currentActingPlayer.hasDisadvantageNextDefense = false;
+        currentActingPlayer.advantageCount = 0;
+        currentActingPlayer.disadvantageCount = 0;
+        currentActingPlayer.advantageAttackCount = 0;
+        currentActingPlayer.disadvantageAttackCount = 0;
+
+        // Clear used enemy modifiers
+        if (currentTarget != null)
+        {
+            currentTarget.advantageWhenAttackedCount = 0;
+            currentTarget.disadvantageWhenAttackedCount = 0;
+        }
     }
 
     void StartMonsterTurn()
@@ -721,12 +809,13 @@ public class CombatManager : MonoBehaviour
             if (player != null)
             {
                 player.hasActedThisCycle = false;
-                player.hasAdvantageNextRoll = false;
-                player.hasDisadvantageNextRoll = false;
-                player.hasAdvantageNextAttack = false;
-                player.hasDisadvantageNextAttack = false;
-                player.hasAdvantageNextDefense = false;
-                player.hasDisadvantageNextDefense = false;
+                player.advantageCount = 0;
+                player.disadvantageCount = 0;
+                player.advantageAttackCount = 0;
+                player.disadvantageAttackCount = 0;
+                player.advantageDefenseCount = 0;
+                player.disadvantageDefenseCount = 0;
+                player.exhaustionDamageLevel = 0;
             }
         }
 

@@ -27,6 +27,12 @@ public class GameUIManager : MonoBehaviour
     private int selectedCharacterIndex = -1;
     private bool isCharacterMode = false;
 
+    [Header("General Color Scheme")]
+    public Color normalText;
+    public Color positiveText;
+    public Color negativeText;
+
+
     void Awake()
     {
         if (Instance == null)

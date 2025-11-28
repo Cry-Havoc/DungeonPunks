@@ -32,6 +32,15 @@ public class PlayerCharacter : MonoBehaviour
     private int _cachedHP;
     private int _cachedMaxHP;
 
+    public int exhaustionDamageLevel { get;  set; }
+    public int disadvantageDefenseCount { get;  set; }
+    public int advantageDefenseCount { get;  set; }
+    public int disadvantageAttackCount { get;  set; }
+    public int advantageAttackCount { get;  set; }
+    public int disadvantageCount { get;  set; }
+    public int advantageCount { get;  set; }
+    public int damageAmount { get; internal set; }
+
     void Update()
     {
         // Check if health changed in inspector

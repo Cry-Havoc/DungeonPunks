@@ -31,7 +31,7 @@ public class ActionButton : MonoBehaviour, IPointerClickHandler, IPointerEnterHa
         }
     }
 
-    public void Initialize(int number, PlayerAction playerAction, PlayerCharacter playerChar, System.Action<PlayerAction> callback)
+    public void InitializeActionButton(int number, PlayerAction playerAction, PlayerCharacter playerChar, System.Action<PlayerAction> callback)
     {
         actionNumber = number;
         action = playerAction;
@@ -57,9 +57,9 @@ public class ActionButton : MonoBehaviour, IPointerClickHandler, IPointerEnterHa
         normalTextContent = $"{actionNumber}. {action.buttonText} ( {successAttr}, {criticalAttr}, {fumbleAttr} )";
 
         // Build hover text with attribute values
-        string successAttrHover = FormatAttribute(action.successCheckAttribute, successValue, true);
-        string criticalAttrHover = FormatAttribute(action.criticalCheckAttribute, criticalValue, true);
-        string fumbleAttrHover = FormatAttribute(action.fumbleCheckAttribute, fumbleValue, true);
+        string successAttrHover = "Success : " + FormatAttribute(action.successCheckAttribute, successValue, true) + "%";
+        string criticalAttrHover = "Critical : " + FormatAttribute(action.criticalCheckAttribute, criticalValue, true) + "%";
+        string fumbleAttrHover = "Fumble : " + FormatAttribute(action.fumbleCheckAttribute, fumbleValue, true) + "%";
 
         hoverTextContent = $"{actionNumber}. {action.buttonText} ( {successAttrHover}, {criticalAttrHover}, {fumbleAttrHover} )";
     }
@@ -69,14 +69,14 @@ public class ActionButton : MonoBehaviour, IPointerClickHandler, IPointerEnterHa
         string text = showValue ? value.ToString() : attribute.ToString();
 
         // Color based on value
-        Color color = Color.white;
+        Color color = GameUIManager.Instance.normalText;
         if (value >= 70)
         {
-            color = Color.blue;
+            color = GameUIManager.Instance.positiveText;
         }
         else if (value <= 30)
         {
-            color = Color.red;
+            color = GameUIManager.Instance.negativeText;
         }
 
         return $"<color=#{ColorUtility.ToHtmlStringRGB(color)}>{text}</color>";

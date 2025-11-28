@@ -30,7 +30,6 @@ public class PlayerAction : ScriptableObject
     [Header("Combat Text")]
     public string targetSelectionText = "Which enemy does {CHARACTER} want to target?";
     public string actionVerb = "attacking"; // "attacking", "taunting", etc.
-    public string characterPronoun = "They"; // "He", "She", "They"
 
     /// <summary>
     /// Gets the attribute value for a given check type

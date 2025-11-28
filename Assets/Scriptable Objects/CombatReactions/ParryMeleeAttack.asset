@@ -15,7 +15,7 @@ MonoBehaviour:
   actionName: 
   buttonText: 
   description: 
-  triggerType: 0
+  triggerType: 1
   successCheckAttribute: 0
   criticalCheckAttribute: 0
   fumbleCheckAttribute: 0
@@ -24,4 +24,3 @@ MonoBehaviour:
   fumbleRollType: 0
   targetSelectionText: Which enemy does {CHARACTER} want to target?
   actionVerb: attacking
-  characterPronoun: They

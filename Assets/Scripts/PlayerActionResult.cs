@@ -6,6 +6,7 @@ public class PlayerActionResult : ScriptableObject
 {
     [Header("Result Info")]
     public string resultName;
+    public string buttonText; // Text shown on button (e.g., "Melee Attack")
     [TextArea(2, 4)]
     public string description;
 

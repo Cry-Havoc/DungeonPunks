@@ -13,6 +13,7 @@ MonoBehaviour:
   m_Name: StrayStike
   m_EditorClassIdentifier: 
   resultName: Stray Strike
+  buttonText: Stray Strike
   description: 
   resultTypes:
   - action: {fileID: 11400000, guid: 113710832b3750d4cb2c3f5d9ed9a306, type: 2}

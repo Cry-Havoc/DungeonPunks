@@ -61,6 +61,25 @@ public class DiceRoller : MonoBehaviour
         }
     }
 
+    public void Start()
+    {
+        HideDice();
+    }
+
+    public void HideDice()
+    {
+        tensDigitDie.gameObject.SetActive(false);
+        onesDigitDie.gameObject.SetActive(false);
+        rollResultText.gameObject.SetActive(false);
+    }
+
+    public void ShowDice()
+    {
+        tensDigitDie.gameObject.SetActive(true);
+        onesDigitDie.gameObject.SetActive(true);
+        rollResultText.gameObject.SetActive(true); 
+    }
+
     /// <summary>
     /// Rolls for a skill check with advantage/disadvantage counts
     /// </summary>
@@ -70,6 +89,8 @@ public class DiceRoller : MonoBehaviour
     /// <param name="callback">Called with final result after all animations</param>
     public void RollForSkillCheck(int skillValue, int advantageCount, int disadvantageCount, System.Action<int> callback)
     {
+        ShowDice();
+
         if (isRolling)
         {
             Debug.LogWarning("Dice are already rolling!");

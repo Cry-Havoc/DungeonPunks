@@ -345,9 +345,17 @@ public class CombatManager : MonoBehaviour
 
         string rollTypeText = GetRollTypeText(successRollType.rollType);
         encounterText.text += $"\nRoll lower than {successAttr} ({successValue}) - ROLLED {successRoll} {rollTypeText}";
-        encounterText.text += $"\n{currentActingPlayer.characterPronoun} is {(successPassed ? "successful" : "unsuccessful")}...";
+        encounterText.text += $"\n{currentActingPlayer.characterPronoun} is {(successPassed ? "successful" : "unsuccessful")} ... press SPACE to continue\n";
 
-        yield return new WaitForSeconds(1f);
+        waitingForSpace = true;
+        selectingMonster = false;
+        selectingAction = false;
+        selectingActionResult = false;
+        onSpacePressed = SpacePressedDuringCombat;
+
+        while (waitingForSpace) yield return null;
+
+        DiceRoller.Instance.HideDice();
 
         // Critical or Fumble Check
         if (successPassed)
@@ -528,6 +536,8 @@ public class CombatManager : MonoBehaviour
 
     void OnActionResultSelected(PlayerActionResult selectedResult)
     {
+        DiceRoller.Instance.HideDice();
+
         selectingActionResult = false;
 
         // Hide result list
@@ -781,6 +791,11 @@ public class CombatManager : MonoBehaviour
     void ContinueCombat()
     {
         StartMonsterTurn();
+    }
+
+    void SpacePressedDuringCombat()
+    {
+        waitingForSpace = false;
     }
 
     void EndCombat(bool playerVictory)

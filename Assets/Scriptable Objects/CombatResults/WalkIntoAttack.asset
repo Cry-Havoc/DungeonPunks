@@ -12,8 +12,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 37d9a57950e02934fbdf4a74f6c45b7c, type: 3}
   m_Name: WalkIntoAttack
   m_EditorClassIdentifier: 
-  resultName: Walk into Attack
-  buttonText: Walk into Attack
+  resultName: Enemy Counterattack
+  buttonText: Enemy Counterattack
   description: 
   resultTypes:
   - action: {fileID: 11400000, guid: 113710832b3750d4cb2c3f5d9ed9a306, type: 2}

@@ -62,7 +62,7 @@ MeshRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 2100000, guid: b0c2e68c0c46b44468ad81871ad4779b, type: 2}
+  - {fileID: 2100000, guid: 3f4093aa52337e242a8d3423707d5710, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -168,7 +168,7 @@ MeshRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 2100000, guid: b0c2e68c0c46b44468ad81871ad4779b, type: 2}
+  - {fileID: 2100000, guid: 3f4093aa52337e242a8d3423707d5710, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -274,7 +274,7 @@ MeshRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 2100000, guid: b0c2e68c0c46b44468ad81871ad4779b, type: 2}
+  - {fileID: 2100000, guid: 3f4093aa52337e242a8d3423707d5710, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -380,7 +380,7 @@ MeshRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 2100000, guid: b0c2e68c0c46b44468ad81871ad4779b, type: 2}
+  - {fileID: 2100000, guid: 3f4093aa52337e242a8d3423707d5710, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -543,7 +543,7 @@ GameObject:
   m_Component:
   - component: {fileID: 7429505398927792177}
   m_Layer: 0
-  m_Name: DefaultDungeonWall
+  m_Name: DefaultDungeonWall_02
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0

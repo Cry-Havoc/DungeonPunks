@@ -11,13 +11,13 @@ public class MazeGenerator : MonoBehaviour
     [Header("Prefabs")]
     public GameObject floorPrefab;
     public GameObject ceilingPrefab;
-    public GameObject wallPrefab;
+    public List<GameObject>  wallPrefabs = new List<GameObject>();
 
     [Header("Cell Settings")]
     public float cellSize = 2f;
 
     // The abstract maze data (true = wall, false = empty)
-    private bool[,] mazeData;
+    private bool[,] mazeData; 
 
     public bool[,] MazeData => mazeData;
 
@@ -124,9 +124,9 @@ public class MazeGenerator : MonoBehaviour
                 }
 
                 // Create wall if this cell is a wall
-                if (mazeData[x, z] && wallPrefab != null)
+                if (mazeData[x, z] && wallPrefabs.Count > 0)
                 {
-                    GameObject wall = Instantiate(wallPrefab, position, Quaternion.identity, transform);
+                    GameObject wall = Instantiate(wallPrefabs[Random.Range(0, wallPrefabs.Count)], position, Quaternion.identity, transform);
                     wall.name = $"Wall_{x}_{z}";
                 }
             }

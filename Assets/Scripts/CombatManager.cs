@@ -306,7 +306,7 @@ public class CombatManager : MonoBehaviour
             actionButtons.Add(actionBtn);
         }
 
-        actionListContainer.parent.gameObject.SetActive(true);
+        actionListContainer.gameObject.SetActive(true);
     }
 
     void OnActionSelected(PlayerAction action)
@@ -590,7 +590,7 @@ public class CombatManager : MonoBehaviour
             actionResultButtons.Add(resultBtn);
         }
 
-        actionResultListContainer.parent.gameObject.SetActive(true);
+        actionResultListContainer.gameObject.SetActive(true);
     }
 
     void OnActionResultSelected(PlayerActionResult selectedResult)
@@ -867,8 +867,8 @@ public class CombatManager : MonoBehaviour
         isInCombat = false;
 
         monsterListUI.SetActive(false);
-        actionListContainer.parent.gameObject.SetActive(false);
-        actionResultListContainer.parent.gameObject.SetActive(false);
+        actionListContainer.gameObject.SetActive(false);
+        actionResultListContainer.gameObject.SetActive(false);
         encounterImage.gameObject.SetActive(false);
 
         // Clean up monster instances
@@ -896,13 +896,13 @@ public class CombatManager : MonoBehaviour
 
         if (playerVictory)
         {
-            encounterText.text = "You were victorious! This time ... Press <u>Space</u> to continue";
+            encounterText.text = "You were victorious!\n\nThis time ... Press <u>Space</u> to continue";
             waitingForSpace = true;
             onSpacePressed = ReturnToDungeon;
         }
         else
         {
-            encounterText.text = "You meet your fate. GAME OVER. Press <u>Space</u> to restart the game.";
+            encounterText.text = "You meet your fate.\n\nGAME OVER.\n\nPress <u>Space</u> to restart the game.";
             waitingForSpace = true;
             onSpacePressed = RestartGame;
         }

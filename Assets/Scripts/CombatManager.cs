@@ -1,10 +1,9 @@
-using System.Collections.Generic;
-using System.Linq;
-using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
+using TMPro;
+using System.Collections.Generic;
+using System.Linq;
 using static DiceRoller;
-using static System.Net.Mime.MediaTypeNames;
 
 public class CombatManager : MonoBehaviour
 {
@@ -18,7 +17,7 @@ public class CombatManager : MonoBehaviour
 
     [Header("UI References")]
     public TextMeshProUGUI encounterText;
-    public UnityEngine.UI.Image encounterImage;
+    public Image encounterImage;
     public GameObject monsterListUI;
     public GameObject characterButtonPrefab;
     public GameObject actionButtonPrefab;
@@ -39,6 +38,7 @@ public class CombatManager : MonoBehaviour
     private bool selectingAction = false;
     private bool selectingActionResult = false;
     private PlayerCharacter currentActingPlayer;
+    private PlayerCharacter randomAllyPlayer;
     private PlayerAction currentAction;
     private Monster currentTarget;
     private ActionResult currentResult;
@@ -108,7 +108,7 @@ public class CombatManager : MonoBehaviour
         }
 
         // Spawn 1-8 monsters
-        int monsterCount = Random.Range(1, 9);
+        int monsterCount = Random.Range(1, 9); 
         activeMonsters.Clear();
 
         List<string> monsterNames = new List<string>();
@@ -118,7 +118,7 @@ public class CombatManager : MonoBehaviour
             int monsterTypeCount = monsterNames.Distinct().Count();
 
             if (monsterTypeCount < 3)
-            { 
+            {
                 GameObject prefab = monsterPrefabs[Random.Range(0, monsterPrefabs.Count)];
                 monsterCopy = prefab.GetComponent<Monster>().CreateCopy();
             }
@@ -126,12 +126,12 @@ public class CombatManager : MonoBehaviour
             {
                 monsterCopy = GetRandomMatchingPrefab(monsterNames).CreateCopy();
             }
-
+             
             monsterCopy.gameObject.SetActive(false);
             activeMonsters.Add(monsterCopy);
 
-            if(!monsterNames.Contains(monsterCopy.baseMonsterName)) 
-            { 
+            if (!monsterNames.Contains(monsterCopy.baseMonsterName))
+            {
                 monsterNames.Add(monsterCopy.baseMonsterName);
             }
         }
@@ -146,7 +146,7 @@ public class CombatManager : MonoBehaviour
 
         encounterText.text = "You are not alone ... \n\n";
 
-        if(monsterCount == 1)
+        if (monsterCount == 1)
         {
             encounterText.text += "A single " + activeMonsters[0].monsterName + " is attacking you!\n\nPress <u>Space</u> to continue..";
         }
@@ -171,7 +171,7 @@ public class CombatManager : MonoBehaviour
         selectingMonster = false;
         selectingAction = false;
         selectingActionResult = false;
-        onSpacePressed = StartPlayerTurn; 
+        onSpacePressed = StartPlayerTurn;
     }
 
     Monster GetRandomMatchingPrefab(List<string> monsterNames)
@@ -185,6 +185,7 @@ public class CombatManager : MonoBehaviour
 
         return matches[Random.Range(0, matches.Count)].GetComponent<Monster>();
     }
+
     void CreateCharacterButtons()
     {
         // Clear existing buttons
@@ -315,7 +316,6 @@ public class CombatManager : MonoBehaviour
         currentAction = action;
 
         // Hide action list
-        //actionListContainer.parent.gameObject.SetActive(false);
         actionListContainer.gameObject.SetActive(false);
 
         // Disable action buttons
@@ -468,14 +468,13 @@ public class CombatManager : MonoBehaviour
         }
 
         encounterText.text += $"\n\n<b>{GetResultText(currentResult)}</b>\n\nPress <u>Space</u> to continue ...";
-         
+
         waitingForSpace = true;
         selectingMonster = false;
         selectingAction = false;
         selectingActionResult = false;
-        onSpacePressed = ShowActionResultSelection; 
+        onSpacePressed = ShowActionResultSelection;
     }
-
     string GetRollTypeText(DiceRoller.RollType rollType)
     {
         switch (rollType)
@@ -484,19 +483,7 @@ public class CombatManager : MonoBehaviour
             case DiceRoller.RollType.Disadvantage: return "(Disadvantage)";
             default: return "";
         }
-    }
-
-    string GetResultText(ActionResult result)
-    {
-        switch (result)
-        {
-            case ActionResult.CriticalSuccess: return "A Critical Success";
-            case ActionResult.PartlySuccess: return "A Partial Success";
-            case ActionResult.PartlyFailure: return "A Partial Failure";
-            case ActionResult.Fumble: return "A Fumble";
-            default: return "";
-        }
-    }
+    } 
 
     DiceRoller.RollTypeData GetModifiedRollType(DiceRoller.RollType baseType, bool isAttack)
     {
@@ -543,7 +530,7 @@ public class CombatManager : MonoBehaviour
         }
         else if (countAdvantages > countDisadvantages)
         {
-            rollTypeData.rollType = DiceRoller.RollType.Advantage; 
+            rollTypeData.rollType = DiceRoller.RollType.Advantage;
         }
         else
         {
@@ -554,11 +541,22 @@ public class CombatManager : MonoBehaviour
         rollTypeData.disadvantages = countDisadvantages;
         return rollTypeData;
     }
+    string GetResultText(ActionResult result)
+    {
+        switch (result)
+        {
+            case ActionResult.CriticalSuccess: return "A Critical Success";
+            case ActionResult.PartlySuccess: return "A Partial Success";
+            case ActionResult.PartlyFailure: return "A Partial Failure";
+            case ActionResult.Fumble: return "A Fumble";
+            default: return "";
+        }
+    }
 
     void ShowActionResultSelection()
     {
         encounterText.text = $"<b>{GetResultText(currentResult)}!</b> Choose an option for {currentActingPlayer.characterName} ...";
-         
+
         selectingActionResult = true;
 
         // Clear existing result buttons
@@ -590,7 +588,7 @@ public class CombatManager : MonoBehaviour
             actionResultButtons.Add(resultBtn);
         }
 
-        actionResultListContainer.gameObject.SetActive(true);
+        actionResultListContainer.parent.gameObject.SetActive(true);
     }
 
     void OnActionResultSelected(PlayerActionResult selectedResult)
@@ -600,7 +598,7 @@ public class CombatManager : MonoBehaviour
         selectingActionResult = false;
 
         // Hide result list
-        actionResultListContainer.gameObject.SetActive(false);
+        actionResultListContainer.parent.gameObject.SetActive(false);
 
         // Disable result buttons
         foreach (var btn in actionResultButtons)
@@ -615,6 +613,18 @@ public class CombatManager : MonoBehaviour
     void ExecuteOutcomes(PlayerActionResult result)
     {
         encounterText.text += $"\n\n{result.buttonText}:";
+         
+
+        List<PlayerCharacter> eligiblePlayers = partyMembers
+                              .Where(p => p != currentActingPlayer && p.healthPoints > 0)
+                             .ToList();
+
+        // Pick one randomly if any exist
+        randomAllyPlayer = null;
+        if (eligiblePlayers.Count > 0)
+        {
+            randomAllyPlayer = eligiblePlayers[Random.Range(0, eligiblePlayers.Count)];
+        } 
 
         foreach (var outcome in result.outcomes)
         {
@@ -645,11 +655,14 @@ public class CombatManager : MonoBehaviour
         // Continue combat
         waitingForSpace = true;
         onSpacePressed = () => StartMonsterTurn();
-        encounterText.text += $"\n\nPress <u>Space</u> to continue...";
+        encounterText.text += $"\n\nPress SPACE to continue...";
     }
 
     void ExecuteOutcome(ActionOutcome outcome, PlayerActionResult result)
     {
+        int playerDamage = 1;
+
+
         switch (outcome)
         {
             case ActionOutcome.DealNormalDamage:
@@ -757,6 +770,11 @@ public class CombatManager : MonoBehaviour
                 encounterText.text += $"\nAll enemies are taunted by {currentActingPlayer.characterName}";
                 break;
 
+            case ActionOutcome.AllyDealsNormalDamage:
+                currentTarget.TakeDamage(randomAllyPlayer.damageAmount);
+                encounterText.text += $"\n{currentTarget.monsterName} suffers {randomAllyPlayer.damageAmount} damage";
+                break;
+
                 // Add more outcomes as needed
         }
     }
@@ -832,7 +850,6 @@ public class CombatManager : MonoBehaviour
         target.TakeDamage(1);
 
         encounterText.text = $"{attackingMonster.monsterName} attacks {target.characterName} for 1 damage!\n\nPress <u>Space</u> to continue ...";
-
         waitingForSpace = true;
 
         // Check if all players dead
@@ -847,15 +864,14 @@ public class CombatManager : MonoBehaviour
         }
     }
 
-    void ContinueCombat()
-    {
-        StartMonsterTurn();
-    }
-
     void SpacePressedDuringCombat()
     {
         encounterText.text = encounterText.text.Replace("Press <u>Space</u> to continue ...", "");
         waitingForSpace = false;
+    }
+    void ContinueCombat()
+    {
+        StartMonsterTurn();
     }
 
     void EndCombat(bool playerVictory)
@@ -868,7 +884,7 @@ public class CombatManager : MonoBehaviour
 
         monsterListUI.SetActive(false);
         actionListContainer.gameObject.SetActive(false);
-        actionResultListContainer.gameObject.SetActive(false);
+        actionResultListContainer.parent.gameObject.SetActive(false);
         encounterImage.gameObject.SetActive(false);
 
         // Clean up monster instances

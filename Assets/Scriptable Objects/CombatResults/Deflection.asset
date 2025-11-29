@@ -10,13 +10,13 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 37d9a57950e02934fbdf4a74f6c45b7c, type: 3}
-  m_Name: Embarrassment
+  m_Name: Deflection
   m_EditorClassIdentifier: 
-  resultName: Embarrassment
-  buttonText: Embarrassment
-  description: 
+  resultName: Deflection
+  buttonText: Deflection
+  description: block the attack & attacks against enemy are focused
   resultTypes:
-  - action: {fileID: 11400000, guid: 90cce6a76e214d8469dc01431c5e22d1, type: 2}
-    result: 3
+  - action: {fileID: 11400000, guid: 582207f893b860948a66aa6544c17c10, type: 2}
+    result: 0
   requiredConditions: 
-  outcomes: 0c000000
+  outcomes: 13000000

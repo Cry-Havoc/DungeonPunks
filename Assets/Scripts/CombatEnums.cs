@@ -83,6 +83,7 @@ public enum ActionOutcome
     GainAdvantageNextAttack,
     DealDamageToAlly,
     TakeExhaustionDamage,
+    AllyDealsNormalDamage,
 
     Nothing
 }

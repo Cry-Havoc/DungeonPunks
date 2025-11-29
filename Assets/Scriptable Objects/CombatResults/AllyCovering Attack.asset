@@ -12,9 +12,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 37d9a57950e02934fbdf4a74f6c45b7c, type: 3}
   m_Name: AllyCovering Attack
   m_EditorClassIdentifier: 
-  resultName: 
-  buttonText: 
-  description: 
-  resultTypes: []
+  resultName: Covering Attack
+  buttonText: Covering Attack
+  description: damage redirected to random ally & ally deals damage back
+  resultTypes:
+  - action: {fileID: 11400000, guid: 9cb3a27235aa14343a67623502a1aaec, type: 2}
+    result: 0
   requiredConditions: 
-  outcomes: 
+  outcomes: 1c0000001d000000

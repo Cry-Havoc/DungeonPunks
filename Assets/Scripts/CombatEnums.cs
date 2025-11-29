@@ -65,7 +65,7 @@ public enum ActionOutcome
     KnockbackEnemy,
     TakeDamage,
     LoseHealth,
-    SkipNextTurn,
+    SkipNextTurn, // TODO IMPLEMENT
     GainAdvantageNextRoll,
     GainDisadvantageNextRoll,
     DrawEnemyAttention,
@@ -84,6 +84,12 @@ public enum ActionOutcome
     DealDamageToAlly,
     TakeExhaustionDamage,
     AllyDealsNormalDamage,
+    AllyRedirectDamage, 
+    EnemySkipNextTurn, // TODO IMPLEMENT
+    AllSkipNextTurn, // TODO IMPLEMENT
+    AllyGainDisadvantageNextTurn, // TODO IMPLEMENT
+
 
     Nothing
+
 }

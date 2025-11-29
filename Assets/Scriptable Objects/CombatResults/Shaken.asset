@@ -18,5 +18,7 @@ MonoBehaviour:
   resultTypes:
   - action: {fileID: 11400000, guid: 582207f893b860948a66aa6544c17c10, type: 2}
     result: 2
+  - action: {fileID: 11400000, guid: 9cb3a27235aa14343a67623502a1aaec, type: 2}
+    result: 2
   requiredConditions: 
-  outcomes: 0800000011000000
+  outcomes: 080000000c000000

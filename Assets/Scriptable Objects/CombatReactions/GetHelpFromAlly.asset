@@ -12,15 +12,15 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 6857da7c710c58a4596ad57aa813663f, type: 3}
   m_Name: GetHelpFromAlly
   m_EditorClassIdentifier: 
-  actionName: 
-  buttonText: 
+  actionName: Ask an Ally for Help
+  buttonText: Ask an Ally for Help
   description: 
   triggerType: 1
-  successCheckAttribute: 0
-  criticalCheckAttribute: 0
+  successCheckAttribute: 3
+  criticalCheckAttribute: 6
   fumbleCheckAttribute: 0
   successRollType: 0
   criticalRollType: 0
   fumbleRollType: 0
   targetSelectionText: Which enemy does {CHARACTER} want to target?
-  actionVerb: attacking
+  actionVerb: get help with

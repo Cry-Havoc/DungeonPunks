@@ -12,15 +12,15 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 6857da7c710c58a4596ad57aa813663f, type: 3}
   m_Name: ParryMeleeAttack
   m_EditorClassIdentifier: 
-  actionName: 
-  buttonText: 
+  actionName: Parry Melee Attack
+  buttonText: Parry Melee Attack
   description: 
   triggerType: 1
-  successCheckAttribute: 0
+  successCheckAttribute: 2
   criticalCheckAttribute: 0
-  fumbleCheckAttribute: 0
+  fumbleCheckAttribute: 3
   successRollType: 0
   criticalRollType: 0
   fumbleRollType: 0
   targetSelectionText: Which enemy does {CHARACTER} want to target?
-  actionVerb: attacking
+  actionVerb: parrying

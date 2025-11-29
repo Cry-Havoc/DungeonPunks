@@ -34,6 +34,9 @@ public class CombatManager : MonoBehaviour
 
     private bool isInCombat = false;
     private bool waitingForSpace = false;
+
+    public ActionTriggerType currentActionType { get; private set; }
+
     private bool selectingMonster = false;
     private bool selectingAction = false;
     private bool selectingActionResult = false;
@@ -165,7 +168,7 @@ public class CombatManager : MonoBehaviour
                 encounterText.text += "and " + lastMonster + "s are attacking you\n\nPress <u>Space</u> to continue..";
             }
         }
-        encounterImage.gameObject.SetActive(false);
+        encounterImage.gameObject.SetActive(true);
 
         waitingForSpace = true;
         selectingMonster = false;
@@ -277,6 +280,8 @@ public class CombatManager : MonoBehaviour
 
         encounterText.text = $"It's time for {currentActingPlayer.characterName} to act...";
 
+        currentActionType = ActionTriggerType.ActiveCombat;
+
         // Show action selection
         ShowActionSelection();
     }
@@ -294,7 +299,7 @@ public class CombatManager : MonoBehaviour
 
         // Get available ActiveCombat actions
         List<PlayerAction> availableActiveCombatActions = availableActions
-            .Where(a => a.triggerType == ActionTriggerType.ActiveCombat)
+            .Where(a => a.triggerType == currentActionType)
             .ToList();
 
         // Create action buttons
@@ -328,16 +333,22 @@ public class CombatManager : MonoBehaviour
         string selectionText = action.targetSelectionText.Replace("{CHARACTER}", currentActingPlayer.characterName);
         encounterText.text = selectionText;
 
-        // Show monster list and enable selection
-        monsterListUI.SetActive(true);
-        selectingMonster = true;
-
-        foreach (var btn in characterButtons)
+        if(currentActionType == ActionTriggerType.ReactionCombat) 
         {
-            btn.SetSelectable(true);
+            StartActionResolution();
         }
-    }
+        else
+        {
+            // Show monster list and enable selection
+            monsterListUI.SetActive(true);
+            selectingMonster = true;
 
+            foreach (var btn in characterButtons)
+            {
+                btn.SetSelectable(true);
+            }
+        } 
+    }
     public void OnMonsterSelected(int monsterIndex)
     {
         if (monsterIndex < 0 || monsterIndex >= activeMonsters.Count) return;
@@ -588,7 +599,7 @@ public class CombatManager : MonoBehaviour
             actionResultButtons.Add(resultBtn);
         }
 
-        actionResultListContainer.parent.gameObject.SetActive(true);
+        actionResultListContainer.gameObject.SetActive(true);
     }
 
     void OnActionResultSelected(PlayerActionResult selectedResult)
@@ -598,7 +609,7 @@ public class CombatManager : MonoBehaviour
         selectingActionResult = false;
 
         // Hide result list
-        actionResultListContainer.parent.gameObject.SetActive(false);
+        actionResultListContainer.gameObject.SetActive(false);
 
         // Disable result buttons
         foreach (var btn in actionResultButtons)
@@ -612,8 +623,7 @@ public class CombatManager : MonoBehaviour
 
     void ExecuteOutcomes(PlayerActionResult result)
     {
-        encounterText.text += $"\n\n{result.buttonText}:";
-         
+        encounterText.text += $"\n\n{result.buttonText} : ( {result.description} )\n"; //TODO remove description
 
         List<PlayerCharacter> eligiblePlayers = partyMembers
                               .Where(p => p != currentActingPlayer && p.healthPoints > 0)
@@ -624,7 +634,7 @@ public class CombatManager : MonoBehaviour
         if (eligiblePlayers.Count > 0)
         {
             randomAllyPlayer = eligiblePlayers[Random.Range(0, eligiblePlayers.Count)];
-        } 
+        }
 
         foreach (var outcome in result.outcomes)
         {
@@ -652,17 +662,22 @@ public class CombatManager : MonoBehaviour
             return;
         }
 
-        // Continue combat
+        // Check if Combat is over combat
         waitingForSpace = true;
-        onSpacePressed = () => StartMonsterTurn();
+
+        if (currentActionType == ActionTriggerType.ReactionCombat) 
+        { 
+            onSpacePressed = () => StartPlayerTurn();
+        }
+        else
+        { 
+            onSpacePressed = () => StartMonsterTurn();
+        }
+
         encounterText.text += $"\n\nPress SPACE to continue...";
     }
-
     void ExecuteOutcome(ActionOutcome outcome, PlayerActionResult result)
-    {
-        int playerDamage = 1;
-
-
+    {  
         switch (outcome)
         {
             case ActionOutcome.DealNormalDamage:
@@ -678,6 +693,13 @@ public class CombatManager : MonoBehaviour
             case ActionOutcome.DealTripleDamage:
                 currentTarget.TakeDamage(currentActingPlayer.damageAmount * 3);
                 encounterText.text += $"\n{currentTarget.monsterName} suffers {currentActingPlayer.damageAmount * 3} damage";
+                break;
+
+            case ActionOutcome.AllyRedirectDamage:
+                // Deals monster's damage (currently 1) to ally
+                int monsterAllyDamage = 1;
+                randomAllyPlayer.TakeDamage(monsterAllyDamage);
+                encounterText.text += $"\n{randomAllyPlayer.characterName} suffers {monsterAllyDamage} damage";
                 break;
 
             case ActionOutcome.TakeDamage:
@@ -777,6 +799,8 @@ public class CombatManager : MonoBehaviour
 
                 // Add more outcomes as needed
         }
+
+        encounterText.text += "\n";
     }
 
     void ClearTemporaryStatusEffects()
@@ -845,15 +869,18 @@ public class CombatManager : MonoBehaviour
                 return;
             }
             target = alivePlayers[Random.Range(0, alivePlayers.Count)];
-        }
+        } 
 
-        target.TakeDamage(1);
+        encounterText.text = $"{attackingMonster.monsterName} attacks {target.characterName}. What now?\n\n";
+        //\n\nWhat will our {target.className} do?\n\n"; 
 
-        encounterText.text = $"{attackingMonster.monsterName} attacks {target.characterName} for 1 damage!\n\nPress <u>Space</u> to continue ...";
         waitingForSpace = true;
 
+        currentActionType = ActionTriggerType.ReactionCombat;
+
+        ShowActionSelection();
         // Check if all players dead
-        List<PlayerCharacter> remainingPlayers = partyMembers.Where(p => p != null && p.healthPoints > 0).ToList();
+        /*List<PlayerCharacter> remainingPlayers = partyMembers.Where(p => p != null && p.healthPoints > 0).ToList();
         if (remainingPlayers.Count == 0)
         {
             onSpacePressed = () => EndCombat(false);
@@ -861,9 +888,8 @@ public class CombatManager : MonoBehaviour
         else
         {
             onSpacePressed = StartPlayerTurn;
-        }
+        }*/
     }
-
     void SpacePressedDuringCombat()
     {
         encounterText.text = encounterText.text.Replace("Press <u>Space</u> to continue ...", "");
@@ -884,7 +910,7 @@ public class CombatManager : MonoBehaviour
 
         monsterListUI.SetActive(false);
         actionListContainer.gameObject.SetActive(false);
-        actionResultListContainer.parent.gameObject.SetActive(false);
+        actionResultListContainer.gameObject.SetActive(false);
         encounterImage.gameObject.SetActive(false);
 
         // Clean up monster instances

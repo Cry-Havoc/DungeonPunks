@@ -132,23 +132,23 @@ PrefabInstance:
     m_Modifications:
     - target: {fileID: 773958366696526533, guid: 002e20f24cd85b443a50195d483666a1, type: 3}
       propertyPath: force
-      value: 74
+      value: 80
       objectReference: {fileID: 0}
     - target: {fileID: 773958366696526533, guid: 002e20f24cd85b443a50195d483666a1, type: 3}
       propertyPath: heart
-      value: 68
+      value: 50
       objectReference: {fileID: 0}
     - target: {fileID: 773958366696526533, guid: 002e20f24cd85b443a50195d483666a1, type: 3}
       propertyPath: reason
-      value: 61
+      value: 50
       objectReference: {fileID: 0}
     - target: {fileID: 773958366696526533, guid: 002e20f24cd85b443a50195d483666a1, type: 3}
       propertyPath: reflexe
-      value: 33
+      value: 80
       objectReference: {fileID: 0}
     - target: {fileID: 773958366696526533, guid: 002e20f24cd85b443a50195d483666a1, type: 3}
       propertyPath: stamina
-      value: 16
+      value: 80
       objectReference: {fileID: 0}
     - target: {fileID: 773958366696526533, guid: 002e20f24cd85b443a50195d483666a1, type: 3}
       propertyPath: className
@@ -156,15 +156,19 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 773958366696526533, guid: 002e20f24cd85b443a50195d483666a1, type: 3}
       propertyPath: willPower
-      value: 86
+      value: 50
       objectReference: {fileID: 0}
     - target: {fileID: 773958366696526533, guid: 002e20f24cd85b443a50195d483666a1, type: 3}
       propertyPath: perception
-      value: 73
+      value: 25
+      objectReference: {fileID: 0}
+    - target: {fileID: 773958366696526533, guid: 002e20f24cd85b443a50195d483666a1, type: 3}
+      propertyPath: damageAmount
+      value: 2
       objectReference: {fileID: 0}
     - target: {fileID: 773958366696526533, guid: 002e20f24cd85b443a50195d483666a1, type: 3}
       propertyPath: healthPoints
-      value: 4
+      value: 10
       objectReference: {fileID: 0}
     - target: {fileID: 773958366696526533, guid: 002e20f24cd85b443a50195d483666a1, type: 3}
       propertyPath: characterName
@@ -172,7 +176,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 773958366696526533, guid: 002e20f24cd85b443a50195d483666a1, type: 3}
       propertyPath: maxHealthPoints
-      value: 6
+      value: 10
       objectReference: {fileID: 0}
     - target: {fileID: 773958366696526533, guid: 002e20f24cd85b443a50195d483666a1, type: 3}
       propertyPath: characterPicture
@@ -448,23 +452,23 @@ PrefabInstance:
     m_Modifications:
     - target: {fileID: 773958366696526533, guid: 002e20f24cd85b443a50195d483666a1, type: 3}
       propertyPath: force
-      value: 61
+      value: 80
       objectReference: {fileID: 0}
     - target: {fileID: 773958366696526533, guid: 002e20f24cd85b443a50195d483666a1, type: 3}
       propertyPath: heart
-      value: 5
+      value: 50
       objectReference: {fileID: 0}
     - target: {fileID: 773958366696526533, guid: 002e20f24cd85b443a50195d483666a1, type: 3}
       propertyPath: reason
-      value: 19
+      value: 50
       objectReference: {fileID: 0}
     - target: {fileID: 773958366696526533, guid: 002e20f24cd85b443a50195d483666a1, type: 3}
       propertyPath: reflexe
-      value: 79
+      value: 50
       objectReference: {fileID: 0}
     - target: {fileID: 773958366696526533, guid: 002e20f24cd85b443a50195d483666a1, type: 3}
       propertyPath: stamina
-      value: 72
+      value: 25
       objectReference: {fileID: 0}
     - target: {fileID: 773958366696526533, guid: 002e20f24cd85b443a50195d483666a1, type: 3}
       propertyPath: className
@@ -472,11 +476,11 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 773958366696526533, guid: 002e20f24cd85b443a50195d483666a1, type: 3}
       propertyPath: willPower
-      value: 67
+      value: 80
       objectReference: {fileID: 0}
     - target: {fileID: 773958366696526533, guid: 002e20f24cd85b443a50195d483666a1, type: 3}
       propertyPath: perception
-      value: 89
+      value: 80
       objectReference: {fileID: 0}
     - target: {fileID: 773958366696526533, guid: 002e20f24cd85b443a50195d483666a1, type: 3}
       propertyPath: damageAmount
@@ -484,7 +488,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 773958366696526533, guid: 002e20f24cd85b443a50195d483666a1, type: 3}
       propertyPath: healthPoints
-      value: 6
+      value: 10
       objectReference: {fileID: 0}
     - target: {fileID: 773958366696526533, guid: 002e20f24cd85b443a50195d483666a1, type: 3}
       propertyPath: characterName
@@ -492,7 +496,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 773958366696526533, guid: 002e20f24cd85b443a50195d483666a1, type: 3}
       propertyPath: maxHealthPoints
-      value: 8
+      value: 10
       objectReference: {fileID: 0}
     - target: {fileID: 773958366696526533, guid: 002e20f24cd85b443a50195d483666a1, type: 3}
       propertyPath: characterPicture
@@ -962,19 +966,19 @@ PrefabInstance:
     m_Modifications:
     - target: {fileID: 773958366696526533, guid: 002e20f24cd85b443a50195d483666a1, type: 3}
       propertyPath: force
-      value: 32
+      value: 80
       objectReference: {fileID: 0}
     - target: {fileID: 773958366696526533, guid: 002e20f24cd85b443a50195d483666a1, type: 3}
       propertyPath: heart
-      value: 87
+      value: 80
       objectReference: {fileID: 0}
     - target: {fileID: 773958366696526533, guid: 002e20f24cd85b443a50195d483666a1, type: 3}
       propertyPath: reason
-      value: 44
+      value: 50
       objectReference: {fileID: 0}
     - target: {fileID: 773958366696526533, guid: 002e20f24cd85b443a50195d483666a1, type: 3}
       propertyPath: stamina
-      value: 64
+      value: 25
       objectReference: {fileID: 0}
     - target: {fileID: 773958366696526533, guid: 002e20f24cd85b443a50195d483666a1, type: 3}
       propertyPath: className
@@ -982,15 +986,19 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 773958366696526533, guid: 002e20f24cd85b443a50195d483666a1, type: 3}
       propertyPath: willPower
-      value: 54
+      value: 80
       objectReference: {fileID: 0}
     - target: {fileID: 773958366696526533, guid: 002e20f24cd85b443a50195d483666a1, type: 3}
       propertyPath: perception
-      value: 63
+      value: 50
+      objectReference: {fileID: 0}
+    - target: {fileID: 773958366696526533, guid: 002e20f24cd85b443a50195d483666a1, type: 3}
+      propertyPath: damageAmount
+      value: 2
       objectReference: {fileID: 0}
     - target: {fileID: 773958366696526533, guid: 002e20f24cd85b443a50195d483666a1, type: 3}
       propertyPath: healthPoints
-      value: 4
+      value: 10
       objectReference: {fileID: 0}
     - target: {fileID: 773958366696526533, guid: 002e20f24cd85b443a50195d483666a1, type: 3}
       propertyPath: characterName
@@ -998,7 +1006,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 773958366696526533, guid: 002e20f24cd85b443a50195d483666a1, type: 3}
       propertyPath: maxHealthPoints
-      value: 6
+      value: 10
       objectReference: {fileID: 0}
     - target: {fileID: 773958366696526533, guid: 002e20f24cd85b443a50195d483666a1, type: 3}
       propertyPath: characterPicture
@@ -1078,23 +1086,23 @@ PrefabInstance:
     m_Modifications:
     - target: {fileID: 773958366696526533, guid: 002e20f24cd85b443a50195d483666a1, type: 3}
       propertyPath: force
-      value: 60
+      value: 80
       objectReference: {fileID: 0}
     - target: {fileID: 773958366696526533, guid: 002e20f24cd85b443a50195d483666a1, type: 3}
       propertyPath: heart
-      value: 60
+      value: 25
       objectReference: {fileID: 0}
     - target: {fileID: 773958366696526533, guid: 002e20f24cd85b443a50195d483666a1, type: 3}
       propertyPath: reason
-      value: 38
+      value: 50
       objectReference: {fileID: 0}
     - target: {fileID: 773958366696526533, guid: 002e20f24cd85b443a50195d483666a1, type: 3}
       propertyPath: reflexe
-      value: 32
+      value: 80
       objectReference: {fileID: 0}
     - target: {fileID: 773958366696526533, guid: 002e20f24cd85b443a50195d483666a1, type: 3}
       propertyPath: stamina
-      value: 66
+      value: 80
       objectReference: {fileID: 0}
     - target: {fileID: 773958366696526533, guid: 002e20f24cd85b443a50195d483666a1, type: 3}
       propertyPath: className
@@ -1102,11 +1110,15 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 773958366696526533, guid: 002e20f24cd85b443a50195d483666a1, type: 3}
       propertyPath: willPower
-      value: 83
+      value: 50
+      objectReference: {fileID: 0}
+    - target: {fileID: 773958366696526533, guid: 002e20f24cd85b443a50195d483666a1, type: 3}
+      propertyPath: damageAmount
+      value: 2
       objectReference: {fileID: 0}
     - target: {fileID: 773958366696526533, guid: 002e20f24cd85b443a50195d483666a1, type: 3}
       propertyPath: healthPoints
-      value: 4
+      value: 10
       objectReference: {fileID: 0}
     - target: {fileID: 773958366696526533, guid: 002e20f24cd85b443a50195d483666a1, type: 3}
       propertyPath: characterName
@@ -1114,7 +1126,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 773958366696526533, guid: 002e20f24cd85b443a50195d483666a1, type: 3}
       propertyPath: maxHealthPoints
-      value: 7
+      value: 10
       objectReference: {fileID: 0}
     - target: {fileID: 773958366696526533, guid: 002e20f24cd85b443a50195d483666a1, type: 3}
       propertyPath: characterPicture
@@ -1745,6 +1757,134 @@ Camera:
   m_CorrespondingSourceObject: {fileID: 2267360856332820108, guid: f0761e1a48905384ba0b3477c52f4360, type: 3}
   m_PrefabInstance: {fileID: 3145262700637155914}
   m_PrefabAsset: {fileID: 0}
+--- !u!1 &1078069246
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1078069248}
+  - component: {fileID: 1078069247}
+  m_Layer: 0
+  m_Name: PunkMusic
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!82 &1078069247
+AudioSource:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1078069246}
+  m_Enabled: 1
+  serializedVersion: 4
+  OutputAudioMixerGroup: {fileID: 0}
+  m_audioClip: {fileID: 8300000, guid: 972fc4d7600fd204a9fec4d801451f03, type: 3}
+  m_PlayOnAwake: 1
+  m_Volume: 1
+  m_Pitch: 1
+  Loop: 1
+  Mute: 0
+  Spatialize: 0
+  SpatializePostEffects: 0
+  Priority: 128
+  DopplerLevel: 1
+  MinDistance: 1
+  MaxDistance: 500
+  Pan2D: 0
+  rolloffMode: 0
+  BypassEffects: 0
+  BypassListenerEffects: 0
+  BypassReverbZones: 0
+  rolloffCustomCurve:
+    serializedVersion: 2
+    m_Curve:
+    - serializedVersion: 3
+      time: 0
+      value: 1
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0.33333334
+      outWeight: 0.33333334
+    - serializedVersion: 3
+      time: 1
+      value: 0
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0.33333334
+      outWeight: 0.33333334
+    m_PreInfinity: 2
+    m_PostInfinity: 2
+    m_RotationOrder: 4
+  panLevelCustomCurve:
+    serializedVersion: 2
+    m_Curve:
+    - serializedVersion: 3
+      time: 0
+      value: 0
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0.33333334
+      outWeight: 0.33333334
+    m_PreInfinity: 2
+    m_PostInfinity: 2
+    m_RotationOrder: 4
+  spreadCustomCurve:
+    serializedVersion: 2
+    m_Curve:
+    - serializedVersion: 3
+      time: 0
+      value: 0
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0.33333334
+      outWeight: 0.33333334
+    m_PreInfinity: 2
+    m_PostInfinity: 2
+    m_RotationOrder: 4
+  reverbZoneMixCustomCurve:
+    serializedVersion: 2
+    m_Curve:
+    - serializedVersion: 3
+      time: 0
+      value: 1
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0.33333334
+      outWeight: 0.33333334
+    m_PreInfinity: 2
+    m_PostInfinity: 2
+    m_RotationOrder: 4
+--- !u!4 &1078069248
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1078069246}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1001 &1237620401
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -2058,23 +2198,23 @@ PrefabInstance:
     m_Modifications:
     - target: {fileID: 773958366696526533, guid: 002e20f24cd85b443a50195d483666a1, type: 3}
       propertyPath: force
-      value: 81
+      value: 80
       objectReference: {fileID: 0}
     - target: {fileID: 773958366696526533, guid: 002e20f24cd85b443a50195d483666a1, type: 3}
       propertyPath: heart
-      value: 30
+      value: 50
       objectReference: {fileID: 0}
     - target: {fileID: 773958366696526533, guid: 002e20f24cd85b443a50195d483666a1, type: 3}
       propertyPath: reason
-      value: 18
+      value: 50
       objectReference: {fileID: 0}
     - target: {fileID: 773958366696526533, guid: 002e20f24cd85b443a50195d483666a1, type: 3}
       propertyPath: reflexe
-      value: 76
+      value: 80
       objectReference: {fileID: 0}
     - target: {fileID: 773958366696526533, guid: 002e20f24cd85b443a50195d483666a1, type: 3}
       propertyPath: stamina
-      value: 90
+      value: 80
       objectReference: {fileID: 0}
     - target: {fileID: 773958366696526533, guid: 002e20f24cd85b443a50195d483666a1, type: 3}
       propertyPath: className
@@ -2082,15 +2222,19 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 773958366696526533, guid: 002e20f24cd85b443a50195d483666a1, type: 3}
       propertyPath: willPower
-      value: 70
+      value: 50
       objectReference: {fileID: 0}
     - target: {fileID: 773958366696526533, guid: 002e20f24cd85b443a50195d483666a1, type: 3}
       propertyPath: perception
-      value: 56
+      value: 25
+      objectReference: {fileID: 0}
+    - target: {fileID: 773958366696526533, guid: 002e20f24cd85b443a50195d483666a1, type: 3}
+      propertyPath: damageAmount
+      value: 2
       objectReference: {fileID: 0}
     - target: {fileID: 773958366696526533, guid: 002e20f24cd85b443a50195d483666a1, type: 3}
       propertyPath: healthPoints
-      value: 7
+      value: 10
       objectReference: {fileID: 0}
     - target: {fileID: 773958366696526533, guid: 002e20f24cd85b443a50195d483666a1, type: 3}
       propertyPath: characterName
@@ -2861,6 +3005,10 @@ PrefabInstance:
     - target: {fileID: 773958366696526533, guid: 002e20f24cd85b443a50195d483666a1, type: 3}
       propertyPath: perception
       value: 73
+      objectReference: {fileID: 0}
+    - target: {fileID: 773958366696526533, guid: 002e20f24cd85b443a50195d483666a1, type: 3}
+      propertyPath: damageAmount
+      value: 2
       objectReference: {fileID: 0}
     - target: {fileID: 773958366696526533, guid: 002e20f24cd85b443a50195d483666a1, type: 3}
       propertyPath: healthPoints
@@ -3860,23 +4008,23 @@ PrefabInstance:
     m_Modifications:
     - target: {fileID: 773958366696526533, guid: 002e20f24cd85b443a50195d483666a1, type: 3}
       propertyPath: force
-      value: 95
+      value: 80
       objectReference: {fileID: 0}
     - target: {fileID: 773958366696526533, guid: 002e20f24cd85b443a50195d483666a1, type: 3}
       propertyPath: heart
-      value: 67
+      value: 50
       objectReference: {fileID: 0}
     - target: {fileID: 773958366696526533, guid: 002e20f24cd85b443a50195d483666a1, type: 3}
       propertyPath: reason
-      value: 27
+      value: 25
       objectReference: {fileID: 0}
     - target: {fileID: 773958366696526533, guid: 002e20f24cd85b443a50195d483666a1, type: 3}
       propertyPath: reflexe
-      value: 59
+      value: 80
       objectReference: {fileID: 0}
     - target: {fileID: 773958366696526533, guid: 002e20f24cd85b443a50195d483666a1, type: 3}
       propertyPath: stamina
-      value: 78
+      value: 50
       objectReference: {fileID: 0}
     - target: {fileID: 773958366696526533, guid: 002e20f24cd85b443a50195d483666a1, type: 3}
       propertyPath: className
@@ -3884,15 +4032,19 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 773958366696526533, guid: 002e20f24cd85b443a50195d483666a1, type: 3}
       propertyPath: willPower
-      value: 88
+      value: 50
       objectReference: {fileID: 0}
     - target: {fileID: 773958366696526533, guid: 002e20f24cd85b443a50195d483666a1, type: 3}
       propertyPath: perception
-      value: 29
+      value: 80
+      objectReference: {fileID: 0}
+    - target: {fileID: 773958366696526533, guid: 002e20f24cd85b443a50195d483666a1, type: 3}
+      propertyPath: damageAmount
+      value: 2
       objectReference: {fileID: 0}
     - target: {fileID: 773958366696526533, guid: 002e20f24cd85b443a50195d483666a1, type: 3}
       propertyPath: healthPoints
-      value: 9
+      value: 10
       objectReference: {fileID: 0}
     - target: {fileID: 773958366696526533, guid: 002e20f24cd85b443a50195d483666a1, type: 3}
       propertyPath: characterName
@@ -4073,3 +4225,4 @@ SceneRoots:
   - {fileID: 676090884}
   - {fileID: 1490578292}
   - {fileID: 85045473}
+  - {fileID: 1078069248}

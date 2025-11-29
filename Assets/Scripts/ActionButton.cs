@@ -54,19 +54,19 @@ public class ActionButton : MonoBehaviour, IPointerClickHandler, IPointerEnterHa
         string criticalAttr = FormatAttribute(action.criticalCheckAttribute, criticalValue, false);
         string fumbleAttr = FormatAttribute(action.fumbleCheckAttribute, fumbleValue, false);
 
-        normalTextContent = $"{actionNumber}. {action.buttonText} ( {successAttr}, {criticalAttr}, {fumbleAttr} )";
+        normalTextContent = $"{actionNumber}. {action.buttonText} - {successAttr}, {criticalAttr}, {fumbleAttr}";
 
         // Build hover text with attribute values
-        string successAttrHover = "Success : " + FormatAttribute(action.successCheckAttribute, successValue, true) + "%";
-        string criticalAttrHover = "Critical : " + FormatAttribute(action.criticalCheckAttribute, criticalValue, true) + "%";
-        string fumbleAttrHover = "Fumble : " + FormatAttribute(action.fumbleCheckAttribute, fumbleValue, true) + "%";
+        string successAttrHover = "Success " + FormatAttribute(action.successCheckAttribute, successValue, true) + "%";
+        string criticalAttrHover = "Critical " + FormatAttribute(action.criticalCheckAttribute, criticalValue, true) + "%";
+        string fumbleAttrHover = "Fumble " + FormatAttribute(action.fumbleCheckAttribute, fumbleValue, true) + "%";
 
-        hoverTextContent = $"{actionNumber}. {action.buttonText} ( {successAttrHover}, {criticalAttrHover}, {fumbleAttrHover} )";
+        hoverTextContent = $"{actionNumber}. {action.buttonText} - {successAttrHover}, {criticalAttrHover}, {fumbleAttrHover}";
     }
 
     string FormatAttribute(PlayerAttribute attribute, int value, bool showValue)
     {
-        string text = showValue ? value.ToString() : attribute.ToString();
+        string text = showValue ? value.ToString() : GameUIManager.ToDisplayName(attribute);
 
         // Color based on value
         Color color = GameUIManager.Instance.normalText;

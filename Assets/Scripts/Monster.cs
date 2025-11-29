@@ -4,6 +4,8 @@ public class Monster : MonoBehaviour
 {
     [Header("Monster Info")]
     public string monsterName;
+    public string baseMonsterName;
+
     public Sprite monsterPicture;
     [Range(1, 10)] public int maxHealthPoints = 5;
 

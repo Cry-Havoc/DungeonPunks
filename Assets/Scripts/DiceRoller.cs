@@ -45,7 +45,7 @@ public class DiceRoller : MonoBehaviour
     {
         public RollType rollType;
         public int advantages; 
-        public int disadvantage;
+        public int disadvantages;
     }
 
 

@@ -32,14 +32,15 @@ public class PlayerCharacter : MonoBehaviour
     private int _cachedHP;
     private int _cachedMaxHP;
 
-    public int exhaustionDamageLevel { get;  set; }
-    public int disadvantageDefenseCount { get;  set; }
-    public int advantageDefenseCount { get;  set; }
-    public int disadvantageAttackCount { get;  set; }
-    public int advantageAttackCount { get;  set; }
-    public int disadvantageCount { get;  set; }
-    public int advantageCount { get;  set; }
-    public int damageAmount { get; internal set; }
+    // Combat status effects
+    [HideInInspector] public int advantageCount = 0;
+    [HideInInspector] public int disadvantageCount = 0;
+    [HideInInspector] public int advantageAttackCount = 0;
+    [HideInInspector] public int disadvantageAttackCount = 0;
+    [HideInInspector] public int advantageDefenseCount = 0;
+    [HideInInspector] public int disadvantageDefenseCount = 0;
+    [HideInInspector] public int exhaustionDamageLevel = 0;
+    public int damageAmount = 1; // Default damage
 
     void Update()
     {
@@ -85,14 +86,14 @@ public class PlayerCharacter : MonoBehaviour
         return $"<b>{characterName}</b>\n" +
                $"<i>{className}</i>\n\n" +
                $"<b>ATTRIBUTES</b>\n" +
-               $"FORCE: {force}\n" +
-               $"PERCEPTION: {perception}\n" +
-               $"REFLEXE: {reflexe}\n" +
-               $"STAMINA: {stamina}\n" +
-               $"REASON: {reason}\n" +
-               $"WILL POWER: {willPower}\n" +
-               $"HEART: {heart}\n\n" +
-               $"<b>HEALTH</b>\n" +
-               $"HP: {healthPoints} / {maxHealthPoints}";
+               $"Force: {force}\n" +
+               $"Sense: {perception}\n" +
+               $"Haste: {reflexe}\n" +
+               $"Stamina: {stamina}\n" +
+               $"Reason: {reason}\n" +
+               $"Will: {willPower}\n" +
+               $"Heart: {heart}\n\n" +
+               $"<b>Health</b>\n" +
+               $"{healthPoints} / {maxHealthPoints}";
     }
 }

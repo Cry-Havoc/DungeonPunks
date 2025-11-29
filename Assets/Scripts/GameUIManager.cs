@@ -230,6 +230,20 @@ public class GameUIManager : MonoBehaviour
         }
     }
 
+    public static string ToDisplayName(PlayerAttribute attribute)
+    {
+        switch (attribute)
+        {
+            case PlayerAttribute.FORCE: return "<u>Force</u>";
+            case PlayerAttribute.PERCEPTION: return "<u>Sense</u>";
+            case PlayerAttribute.REFLEXE: return "<u>Haste</u>";
+            case PlayerAttribute.STAMINA: return "<u>Stamina</u>";
+            case PlayerAttribute.REASON: return "<u>Reason</u>";
+            case PlayerAttribute.WILLPOWER: return "<u>Will</u>";
+            case PlayerAttribute.HEART: return "<u>Heart</u>";
+            default: return attribute.ToString();
+        }
+    }
     void OnDestroy()
     {
         if (dungeonRenderTexture != null)

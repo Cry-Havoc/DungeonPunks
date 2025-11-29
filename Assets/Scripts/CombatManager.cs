@@ -4,6 +4,7 @@ using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
 using static DiceRoller;
+using static System.Net.Mime.MediaTypeNames;
 
 public class CombatManager : MonoBehaviour
 {
@@ -17,7 +18,7 @@ public class CombatManager : MonoBehaviour
 
     [Header("UI References")]
     public TextMeshProUGUI encounterText;
-    public Image encounterImage;
+    public UnityEngine.UI.Image encounterImage;
     public GameObject monsterListUI;
     public GameObject characterButtonPrefab;
     public GameObject actionButtonPrefab;
@@ -86,7 +87,7 @@ public class CombatManager : MonoBehaviour
         }
 
         // Show encounter warning
-        encounterText.text = "You are not alone ... press SPACE to continue";
+        encounterText.text = "You are not alone ... press <u>Space</u> to continue";
         encounterImage.gameObject.SetActive(false);
 
         waitingForSpace = true;
@@ -110,12 +111,29 @@ public class CombatManager : MonoBehaviour
         int monsterCount = Random.Range(1, 9);
         activeMonsters.Clear();
 
+        List<string> monsterNames = new List<string>();
+        Monster monsterCopy = null;
         for (int i = 0; i < monsterCount; i++)
         {
-            GameObject prefab = monsterPrefabs[Random.Range(0, monsterPrefabs.Count)];
-            Monster monsterCopy = prefab.GetComponent<Monster>().CreateCopy();
+            int monsterTypeCount = monsterNames.Distinct().Count();
+
+            if (monsterTypeCount < 3)
+            { 
+                GameObject prefab = monsterPrefabs[Random.Range(0, monsterPrefabs.Count)];
+                monsterCopy = prefab.GetComponent<Monster>().CreateCopy();
+            }
+            else
+            {
+                monsterCopy = GetRandomMatchingPrefab(monsterNames).CreateCopy();
+            }
+
             monsterCopy.gameObject.SetActive(false);
             activeMonsters.Add(monsterCopy);
+
+            if(!monsterNames.Contains(monsterCopy.baseMonsterName)) 
+            { 
+                monsterNames.Add(monsterCopy.baseMonsterName);
+            }
         }
 
         // Show first monster
@@ -126,10 +144,47 @@ public class CombatManager : MonoBehaviour
         // Hide all UI initially
         monsterListUI.SetActive(false);
 
-        // Start first player turn
-        StartPlayerTurn();
+        encounterText.text = "You are not alone ... \n\n";
+
+        if(monsterCount == 1)
+        {
+            encounterText.text += "A single " + activeMonsters[0].monsterName + " is attacking you!\n\nPress <u>Space</u> to continue..";
+        }
+        else
+        {
+            if (monsterNames.Count > 0)
+            {
+                // Add all but the last monster
+                for (int i = 0; i < monsterNames.Count - 1; i++)
+                {
+                    encounterText.text += monsterNames[i] + "s, ";
+                }
+
+                // Add the last monster with the final sentence
+                string lastMonster = monsterNames[monsterNames.Count - 1];
+                encounterText.text += "and " + lastMonster + "s are attacking you\n\nPress <u>Space</u> to continue..";
+            }
+        }
+        encounterImage.gameObject.SetActive(false);
+
+        waitingForSpace = true;
+        selectingMonster = false;
+        selectingAction = false;
+        selectingActionResult = false;
+        onSpacePressed = StartPlayerTurn; 
     }
 
+    Monster GetRandomMatchingPrefab(List<string> monsterNames)
+    {
+        var matches = monsterPrefabs
+            .Where(prefab => monsterNames.Contains(prefab.GetComponent<Monster>().baseMonsterName))
+            .ToList();
+
+        if (matches.Count == 0)
+            return null;
+
+        return matches[Random.Range(0, matches.Count)].GetComponent<Monster>();
+    }
     void CreateCharacterButtons()
     {
         // Clear existing buttons
@@ -335,7 +390,7 @@ public class CombatManager : MonoBehaviour
         int successRoll = 0;
 
         bool rollComplete = false;
-        DiceRoller.Instance.RollForSkillCheck(successValue, successRollType.advantages, successRollType.disadvantage, (result) => {
+        DiceRoller.Instance.RollForSkillCheck(successValue, successRollType.advantages, successRollType.disadvantages, (result) => {
             successRoll = result;
             successPassed = result <= successValue;
             rollComplete = true;
@@ -344,8 +399,9 @@ public class CombatManager : MonoBehaviour
         while (!rollComplete) yield return null;
 
         string rollTypeText = GetRollTypeText(successRollType.rollType);
-        encounterText.text += $"\nRoll lower than {successAttr} ({successValue}) - ROLLED {successRoll} {rollTypeText}";
-        encounterText.text += $"\n{currentActingPlayer.characterPronoun} is {(successPassed ? "successful" : "unsuccessful")} ... press SPACE to continue\n";
+
+        encounterText.text += $" - Rolled {successRoll} {rollTypeText}";
+        encounterText.text += $"\n\n{currentActingPlayer.characterPronoun} {(successPassed ? "successful" : "unsuccessful")}\n\nPress <u>Space</u> to continue ...";
 
         waitingForSpace = true;
         selectingMonster = false;
@@ -365,13 +421,13 @@ public class CombatManager : MonoBehaviour
             string criticalAttr = currentAction.GetAttributeName(currentAction.criticalCheckAttribute);
             DiceRoller.RollTypeData criticalRollType = GetModifiedRollType(currentAction.criticalRollType, true);
 
-            encounterText.text += $"\n\nFor a Critical Success roll lower than {criticalAttr} ({criticalValue})...";
+            encounterText.text += $"\nFor a Critical roll lower than {criticalAttr} ({criticalValue})...";
 
             bool criticalPassed = false;
             int criticalRoll = 0;
 
             rollComplete = false;
-            DiceRoller.Instance.RollForSkillCheck(criticalValue, criticalRollType.advantages, criticalRollType.disadvantage, (result) => {
+            DiceRoller.Instance.RollForSkillCheck(criticalValue, criticalRollType.advantages, criticalRollType.disadvantages, (result) => {
                 criticalRoll = result;
                 criticalPassed = result <= criticalValue;
                 rollComplete = true;
@@ -380,7 +436,7 @@ public class CombatManager : MonoBehaviour
             while (!rollComplete) yield return null;
 
             rollTypeText = GetRollTypeText(criticalRollType.rollType);
-            encounterText.text += $"\nRoll lower than {criticalAttr} ({criticalValue}) - ROLLED {criticalRoll} {rollTypeText}";
+            encounterText.text += $" - Rolled {criticalRoll} {rollTypeText}";
 
             currentResult = criticalPassed ? ActionResult.CriticalSuccess : ActionResult.PartlySuccess;
         }
@@ -391,13 +447,13 @@ public class CombatManager : MonoBehaviour
             string fumbleAttr = currentAction.GetAttributeName(currentAction.fumbleCheckAttribute);
             DiceRoller.RollTypeData fumbleRollType = GetModifiedRollType(currentAction.fumbleRollType, false);
 
-            encounterText.text += $"\n\nTo avoid a Fumble roll lower than {fumbleAttr} ({fumbleValue})...";
+            encounterText.text += $"\nTo avoid a Fumble roll lower than {fumbleAttr} ({fumbleValue})...";
 
             bool fumblePassed = false;
             int fumbleRoll = 0;
 
             rollComplete = false;
-            DiceRoller.Instance.RollForSkillCheck(fumbleValue, fumbleRollType.advantages, fumbleRollType.disadvantage, (result) => {
+            DiceRoller.Instance.RollForSkillCheck(fumbleValue, fumbleRollType.advantages, fumbleRollType.disadvantages, (result) => {
                 fumbleRoll = result;
                 fumblePassed = result <= fumbleValue;
                 rollComplete = true;
@@ -406,17 +462,18 @@ public class CombatManager : MonoBehaviour
             while (!rollComplete) yield return null;
 
             rollTypeText = GetRollTypeText(fumbleRollType.rollType);
-            encounterText.text += $"\nRoll lower than {fumbleAttr} ({fumbleValue}) - ROLLED {fumbleRoll} {rollTypeText}";
+            encounterText.text += $" - Rolled {fumbleRoll} {rollTypeText}";
 
             currentResult = fumblePassed ? ActionResult.PartlyFailure : ActionResult.Fumble;
         }
 
-        encounterText.text += $"\n\n<b>{GetResultText(currentResult)}</b>";
-
-        yield return new WaitForSeconds(1f);
-
-        // Show action result selection
-        ShowActionResultSelection();
+        encounterText.text += $"\n\n<b>{GetResultText(currentResult)}</b>\n\nPress <u>Space</u> to continue ...";
+         
+        waitingForSpace = true;
+        selectingMonster = false;
+        selectingAction = false;
+        selectingActionResult = false;
+        onSpacePressed = ShowActionResultSelection; 
     }
 
     string GetRollTypeText(DiceRoller.RollType rollType)
@@ -494,12 +551,14 @@ public class CombatManager : MonoBehaviour
         }
 
         rollTypeData.advantages = countAdvantages;
-        rollTypeData.disadvantage = countDisadvantages;
+        rollTypeData.disadvantages = countDisadvantages;
         return rollTypeData;
     }
 
     void ShowActionResultSelection()
     {
+        encounterText.text = $"<b>{GetResultText(currentResult)}!</b> Choose an option for {currentActingPlayer.characterName} ...";
+         
         selectingActionResult = true;
 
         // Clear existing result buttons
@@ -586,7 +645,7 @@ public class CombatManager : MonoBehaviour
         // Continue combat
         waitingForSpace = true;
         onSpacePressed = () => StartMonsterTurn();
-        encounterText.text += $"\n\nPress SPACE to continue...";
+        encounterText.text += $"\n\nPress <u>Space</u> to continue...";
     }
 
     void ExecuteOutcome(ActionOutcome outcome, PlayerActionResult result)
@@ -772,7 +831,7 @@ public class CombatManager : MonoBehaviour
 
         target.TakeDamage(1);
 
-        encounterText.text = $"{attackingMonster.monsterName} attacks {target.characterName} for 1 damage! Press SPACE to continue.";
+        encounterText.text = $"{attackingMonster.monsterName} attacks {target.characterName} for 1 damage!\n\nPress <u>Space</u> to continue ...";
 
         waitingForSpace = true;
 
@@ -795,6 +854,7 @@ public class CombatManager : MonoBehaviour
 
     void SpacePressedDuringCombat()
     {
+        encounterText.text = encounterText.text.Replace("Press <u>Space</u> to continue ...", "");
         waitingForSpace = false;
     }
 
@@ -836,13 +896,13 @@ public class CombatManager : MonoBehaviour
 
         if (playerVictory)
         {
-            encounterText.text = "You were victorious! This time ... Press Space to continue";
+            encounterText.text = "You were victorious! This time ... Press <u>Space</u> to continue";
             waitingForSpace = true;
             onSpacePressed = ReturnToDungeon;
         }
         else
         {
-            encounterText.text = "You meet your fate. GAME OVER. Press Space to restart the game.";
+            encounterText.text = "You meet your fate. GAME OVER. Press <u>Space</u> to restart the game.";
             waitingForSpace = true;
             onSpacePressed = RestartGame;
         }

@@ -51,6 +51,6 @@ public class PlayerAction : ScriptableObject
 
     public string GetAttributeName(PlayerAttribute attribute)
     {
-        return attribute.ToString();
+        return GameUIManager.ToDisplayName(attribute);
     }
 }

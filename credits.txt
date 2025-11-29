@@ -1,0 +1,4 @@
+Game Design, Code and Art by : Jörg Reisig
+
+Code Assistance : https://claude.ai/
+Dice Models by : https://assetstore.unity.com/publishers/55245

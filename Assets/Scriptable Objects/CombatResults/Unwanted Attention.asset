@@ -14,7 +14,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   resultName: Unwanted Attention
   buttonText: Unwanted Attention
-  description: 
+  description: all enemies will attack you
   resultTypes:
   - action: {fileID: 11400000, guid: 90cce6a76e214d8469dc01431c5e22d1, type: 2}
     result: 3

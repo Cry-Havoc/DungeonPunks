@@ -14,7 +14,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   resultName: Taunted Enemy
   buttonText: Taunted Enemy
-  description: 
+  description: enemy is taunted and will attack only you
   resultTypes:
   - action: {fileID: 11400000, guid: 90cce6a76e214d8469dc01431c5e22d1, type: 2}
     result: 1

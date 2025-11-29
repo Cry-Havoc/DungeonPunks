@@ -14,7 +14,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   resultName: Hesitant Enemy
   buttonText: Hesitant Enemy
-  description: 
+  description: enemy  is taunted and all are guarded against their attacks
   resultTypes:
   - action: {fileID: 11400000, guid: 90cce6a76e214d8469dc01431c5e22d1, type: 2}
     result: 0

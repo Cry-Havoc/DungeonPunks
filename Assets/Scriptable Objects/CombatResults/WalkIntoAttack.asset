@@ -14,7 +14,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   resultName: Enemy Counterattack
   buttonText: Enemy Counterattack
-  description: 
+  description: suffer full damage
   resultTypes:
   - action: {fileID: 11400000, guid: 113710832b3750d4cb2c3f5d9ed9a306, type: 2}
     result: 3

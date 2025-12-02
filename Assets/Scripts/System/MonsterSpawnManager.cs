@@ -57,9 +57,10 @@ public class MonsterSpawnManager : MonoBehaviour
     {
         pendingAnnouncementTexts.Clear();
 
+        // TODO pick only one of the spawn data to change state or be killed
         foreach (var spawnData in monsterSpawnData)
         {
-            if (spawnData.monsterPrefab == null) continue;
+            if (spawnData.monsterPrefab == null) continue; 
 
             // Check if a Waiting monster should become active
             if (spawnData.spawnState == MonsterSpawnState.Waiting && 
@@ -70,7 +71,7 @@ public class MonsterSpawnManager : MonoBehaviour
                 
                 Debug.Log($"Day {currentDay}: {spawnData.GetMonsterName()} now Wandering_Rare");
             }
-            // Check if a Wandering_Rare monster should become common
+            // Check if a Wandering_Rare monster should become common  
             else if (spawnData.spawnState == MonsterSpawnState.Wandering_Rare)
             {
                 // Random chance to promote rare to common (20% per rest)

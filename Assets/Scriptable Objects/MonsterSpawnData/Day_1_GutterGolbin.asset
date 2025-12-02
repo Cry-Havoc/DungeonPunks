@@ -1,0 +1,23 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 7d0fbbb748f08744fbb9d3ac5a670512, type: 3}
+  m_Name: Day_1_GutterGolbin
+  m_EditorClassIdentifier: 
+  monsterPrefab: {fileID: 4312615474800689644, guid: a1d3f16c507776343bc9b3065b6e8c78, type: 3}
+  spawnState: 1
+  dayThreshold: 1
+  normalWeight: 1
+  rareWeight: 0.3
+  rumorText: You hear rumors that {MONSTER}s found their way into the Dungeon
+  commonText: The dungeon is full of sounds of wandering {MONSTER}s
+  extinctionText: You hear screams of {MONSTER}s, later you find their remains torn
+    into pieces by {KILLER}s

@@ -8,7 +8,7 @@ public class PlayerPartyController : MonoBehaviour
 
     [Header("References")]
     public MazeGenerator mazeGenerator;
-    public Camera playerCamera; 
+    public Camera playerCamera;
 
     [Header("Movement Settings")]
     public float moveSpeed = 1f; // Time in seconds to move one cell
@@ -52,7 +52,7 @@ public class PlayerPartyController : MonoBehaviour
         if (playerCamera == null)
         {
             playerCamera = GetComponentInChildren<Camera>();
-        } 
+        }
 
         // Wait a frame for maze to generate, then position player
         StartCoroutine(InitializePosition());
@@ -66,6 +66,28 @@ public class PlayerPartyController : MonoBehaviour
         Vector3 worldPos = GridToWorldPosition(gridPosition);
         transform.position = worldPos + Vector3.up * cellSize * 0.5f; // Center camera at eye level
         transform.rotation = Quaternion.Euler(0, 0, 0); // Face north
+
+        // Initialize prisoner system
+        if (PrisonerSystem.Instance != null)
+        {
+            PrisonerSystem.Instance.Initialize(gridPosition);
+        }
+
+        // Show entrance message
+        ShowEntranceMessage();
+    }
+
+    /// <summary>
+    /// Shows the entrance message when at start position
+    /// </summary>
+    void ShowEntranceMessage()
+    {
+        if (PrisonerSystem.Instance != null && GameUIManager.Instance != null)
+        {
+            string message = PrisonerSystem.Instance.GetEntranceMessage();
+            GameUIManager.Instance.encounterText.text = message;
+            GameUIManager.Instance.encounterFrame.gameObject.SetActive(false);
+        }
     }
 
     void Update()
@@ -81,8 +103,22 @@ public class PlayerPartyController : MonoBehaviour
         if (!enabled)
             return;
 
-        if(CombatManager.Instance.IsInCombat) 
-            return; 
+        if (CombatManager.Instance != null && CombatManager.Instance.IsInCombat)
+            return;
+
+        if (RestManager.Instance != null && RestManager.Instance.IsResting)
+            return;
+
+        // Clear rest offer when player presses any movement key (but not Return)
+        if (RestManager.Instance != null && RestManager.Instance.WaitingForRestInput)
+        {
+            if (Input.GetKeyDown(KeyCode.W) || Input.GetKeyDown(KeyCode.S) ||
+                Input.GetKeyDown(KeyCode.A) || Input.GetKeyDown(KeyCode.D) ||
+                Input.GetKeyDown(KeyCode.Q) || Input.GetKeyDown(KeyCode.E))
+            {
+                RestManager.Instance.ClearRestOffer();
+            }
+        }
 
         // Queue movement commands
         if (Input.GetKeyDown(KeyCode.W))
@@ -184,7 +220,7 @@ public class PlayerPartyController : MonoBehaviour
         gridPosition = targetGrid;
         isMoving = false;
 
-        // Check for random encounter
+        // Check for random encounter or special locations
         CheckForEncounter();
     }
 
@@ -242,9 +278,109 @@ public class PlayerPartyController : MonoBehaviour
 
     void CheckForEncounter()
     {
+        // Reset the daily rest offer flag
+        if (RestManager.Instance != null)
+        {
+            RestManager.Instance.ResetDailyRestOffer();
+        }
+
+        // Check if at start position (entrance)
+        if (PrisonerSystem.Instance != null && PrisonerSystem.Instance.IsAtStartPosition(gridPosition))
+        {
+            ShowEntranceMessage();
+            return; // No encounters at entrance
+        }
+
+        // Check if at prisoner location
+        if (PrisonerSystem.Instance != null && PrisonerSystem.Instance.IsPrisonerAt(gridPosition))
+        {
+            RescuePrisoner();
+            return; // No encounters at prisoner locations
+        }
+
+        // Normal encounter check
         if (CombatManager.Instance != null && Random.value < encounterChance)
         {
             CombatManager.Instance.StartRandomEncounter();
         }
+        else
+        {
+            // No encounter - offer rest
+            if (RestManager.Instance != null)
+            {
+                RestManager.Instance.OfferRest();
+            }
+        }
+    }
+
+    /// <summary>
+    /// Handles rescuing a prisoner at current position
+    /// </summary>
+    void RescuePrisoner()
+    {
+        PrisonerData prisoner = PrisonerSystem.Instance.RescuePrisoner(gridPosition);
+
+        if (prisoner != null && GameUIManager.Instance != null)
+        {
+            // Show initial rescue message
+            GameUIManager.Instance.encounterText.text = prisoner.GetRescueMessage();
+            GameUIManager.Instance.encounterFrame.gameObject.SetActive(false);
+
+            // Start teaching sequence
+            StartCoroutine(TeachingSequence(prisoner));
+        }
+    }
+
+    /// <summary>
+    /// Handles the teaching sequence
+    /// </summary>
+    IEnumerator TeachingSequence(PrisonerData prisoner)
+    {
+        enabled = false; // Disable movement
+
+        // Wait for space to show character selection
+        while (!Input.GetKeyDown(KeyCode.Space))
+        {
+            yield return null;
+        }
+
+        // Hide initial message
+        if (GameUIManager.Instance != null)
+        {
+            GameUIManager.Instance.encounterText.text = "";
+        }
+
+        // Show character selection UI
+        if (PrisonerTeachingUI.Instance != null && GameUIManager.Instance != null)
+        {
+            PlayerCharacter[] party = GameUIManager.Instance.partyMembers;
+
+            bool teachingComplete = false;
+            PrisonerTeachingUI.Instance.ShowTeachingSelection(
+                prisoner,
+                party,
+                () => { teachingComplete = true; }
+            );
+
+            // Wait for character selection
+            while (!teachingComplete)
+            {
+                yield return null;
+            }
+        }
+
+        // Wait for space after upgrade message
+        while (!Input.GetKeyDown(KeyCode.Space))
+        {
+            yield return null;
+        }
+
+        // Clear message
+        if (GameUIManager.Instance != null)
+        {
+            GameUIManager.Instance.encounterText.text = "";
+        }
+
+        enabled = true; // Re-enable movement
     }
 }

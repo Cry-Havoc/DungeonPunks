@@ -1,4 +1,4 @@
-using UnityEngine;
+﻿using UnityEngine;
 using UnityEngine.UI;
 using TMPro;
 using System.Collections.Generic;
@@ -114,34 +114,59 @@ public class CombatManager : MonoBehaviour
             GameUIManager.Instance.SetCombatMode();
         }
 
-        // Spawn 1-8 monsters
-        int monsterCount = Random.Range(1, 9); 
-        activeMonsters.Clear();
-
+        // Switch UI to combat mode
+        GameUIManager.Instance.SetCombatMode();
+         
         List<string> monsterNames = new List<string>();
-        Monster monsterCopy = null;
-        for (int i = 0; i < monsterCount; i++)
+
+        // ✅ USES MONSTERSPAWNMANAGER
+        if (MonsterSpawnManager.Instance != null)
         {
-            int monsterTypeCount = monsterNames.Distinct().Count();
+            activeMonsters = MonsterSpawnManager.Instance.SpawnEncounter();
 
-            if (monsterTypeCount < 3)
+            foreach(Monster monster in activeMonsters)
             {
-                GameObject prefab = monsterPrefabs[Random.Range(0, monsterPrefabs.Count)];
-                monsterCopy = prefab.GetComponent<Monster>().CreateCopy();
-            }
-            else
-            {
-                monsterCopy = GetRandomMatchingPrefab(monsterNames).CreateCopy();
-            }
-             
-            monsterCopy.gameObject.SetActive(false);
-            activeMonsters.Add(monsterCopy);
-
-            if (!monsterNames.Contains(monsterCopy.baseMonsterName))
-            {
-                monsterNames.Add(monsterCopy.baseMonsterName);
+                if (!monsterNames.Contains(monster.baseMonsterName))
+                {
+                    monsterNames.Add(monster.baseMonsterName);
+                }
             }
         }
+        else
+        {
+            // ⚠️ Fallback only if MonsterSpawnManager missing
+            Debug.LogWarning("MonsterSpawnManager not found, using fallback spawn system");
+            // Spawn 1-8 monsters
+            int monsterCount = Random.Range(1, 9);
+            activeMonsters.Clear();
+
+            Monster monsterCopy = null;
+            for (int i = 0; i < monsterCount; i++)
+            {
+                int monsterTypeCount = monsterNames.Distinct().Count();
+
+                if (monsterTypeCount < 3)
+                {
+                    GameObject prefab = monsterPrefabs[Random.Range(0, monsterPrefabs.Count)];
+                    monsterCopy = prefab.GetComponent<Monster>().CreateCopy();
+                }
+                else
+                {
+                    monsterCopy = GetRandomMatchingPrefab(monsterNames).CreateCopy();
+                }
+
+                monsterCopy.gameObject.SetActive(false);
+                activeMonsters.Add(monsterCopy);
+
+                if (!monsterNames.Contains(monsterCopy.baseMonsterName))
+                {
+                    monsterNames.Add(monsterCopy.baseMonsterName);
+                }
+            }
+        }
+        
+
+        
 
         // Show first monster
         currentActiveMonsterIndex = 0;
@@ -153,7 +178,7 @@ public class CombatManager : MonoBehaviour
 
         encounterText.text = "You are not alone ... \n\n";
 
-        if (monsterCount == 1)
+        if (activeMonsters.Count == 1)
         {
             encounterText.text += "A single " + activeMonsters[0].monsterName + " is attacking you!\n\nPress <u>Space</u> to continue..";
         }

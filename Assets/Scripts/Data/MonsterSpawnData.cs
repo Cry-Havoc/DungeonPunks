@@ -3,8 +3,8 @@ using UnityEngine;
 /// <summary>
 /// Tracks spawn state and progression for a monster type
 /// </summary>
-[System.Serializable]
-public class MonsterSpawnData
+[CreateAssetMenu(fileName = "New Monster Spawn Data", menuName = "DungeonPunks/Monster Spawn Data")]
+public class MonsterSpawnData : ScriptableObject
 {
     [Header("Monster Reference")]
     public GameObject monsterPrefab;

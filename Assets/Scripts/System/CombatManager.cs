@@ -65,6 +65,10 @@ public class CombatManager : MonoBehaviour
 
     void Update()
     {
+        // Block input when menu is open
+        if (MainMenuManager.IsGamePaused())
+            return;
+
         // Only process space if we're waiting and not selecting anything
         if (waitingForSpace && !selectingMonster && !selectingAction && !selectingActionResult && Input.GetKeyDown(KeyCode.Space))
         {

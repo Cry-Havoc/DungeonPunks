@@ -70,6 +70,10 @@ public class PlayerPartyController : MonoBehaviour
 
     void Update()
     {
+        // Block input when menu is open
+        if (MainMenuManager.IsGamePaused())
+            return;
+
         if (mazeGenerator == null || mazeGenerator.MazeData == null)
             return;
 

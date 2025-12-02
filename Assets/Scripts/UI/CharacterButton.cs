@@ -16,6 +16,10 @@ public class CharacterButton : MonoBehaviour, IPointerClickHandler, IPointerEnte
 
     void Update()
     {
+        // Block input when menu is open
+        if (MainMenuManager.IsGamePaused())
+            return;
+
         // Handle number key input
         if (isSelectable && characterNumber >= 1 && characterNumber <= 8)
         {

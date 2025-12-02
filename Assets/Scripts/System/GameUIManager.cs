@@ -17,21 +17,20 @@ public class GameUIManager : MonoBehaviour
     public Transform bottomRowContainer;
 
     [Header("References")]
-    public Camera dungeonCamera; 
+    public Camera dungeonCamera;
 
     [Header("Party Members")]
     public PlayerCharacter[] partyMembers = new PlayerCharacter[6];
-
-    private RenderTexture dungeonRenderTexture;
-    private PlayerFrameUI[] playerFrameUIs = new PlayerFrameUI[6];
-    private int selectedCharacterIndex = -1;
-    private bool isCharacterMode = false;
 
     [Header("General Color Scheme")]
     public Color normalText;
     public Color positiveText;
     public Color negativeText;
 
+    private RenderTexture dungeonRenderTexture;
+    private PlayerFrameUI[] playerFrameUIs = new PlayerFrameUI[6];
+    private int selectedCharacterIndex = -1;
+    private bool isCharacterMode = false;
 
     void Awake()
     {
@@ -49,10 +48,15 @@ public class GameUIManager : MonoBehaviour
     {
         SetupDungeonCamera();
         SpawnPlayerFrames();
-          
+
         if (CombatManager.Instance != null)
         {
             CombatManager.Instance.Initialize(partyMembers);
+        }
+
+        if (RestManager.Instance != null)
+        {
+            RestManager.Instance.Initialize(partyMembers);
         }
 
         SetDungeonMode();
@@ -60,6 +64,10 @@ public class GameUIManager : MonoBehaviour
 
     void Update()
     {
+        // Block input when menu is open
+        if (MainMenuManager.IsGamePaused())
+            return;
+
         HandleModeInput();
     }
 
@@ -192,6 +200,36 @@ public class GameUIManager : MonoBehaviour
         }
     }
 
+    /// <summary>
+    /// Sets UI to rest mode (showing campfire)
+    /// </summary>
+    public void SetRestMode(Sprite campfireSprite)
+    {
+        isCharacterMode = false;
+
+        // Hide dungeon rendering
+        if (dungeonFrame != null)
+        {
+            dungeonFrame.gameObject.SetActive(false);
+        }
+
+        // Show campfire in encounter frame
+        if (encounterFrame != null)
+        {
+            encounterFrame.gameObject.SetActive(true);
+            if (campfireSprite != null)
+            {
+                encounterFrame.sprite = campfireSprite;
+            }
+        }
+
+        // Disable party controller
+        if (PlayerPartyController.Instance != null)
+        {
+            PlayerPartyController.Instance.enabled = false;
+        }
+    }
+
     void SetCharacterMode()
     {
         isCharacterMode = true;
@@ -244,6 +282,7 @@ public class GameUIManager : MonoBehaviour
             default: return attribute.ToString();
         }
     }
+
     void OnDestroy()
     {
         if (dungeonRenderTexture != null)

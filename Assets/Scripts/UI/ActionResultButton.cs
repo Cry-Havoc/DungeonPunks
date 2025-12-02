@@ -16,6 +16,10 @@ public class ActionResultButton : MonoBehaviour, IPointerClickHandler, IPointerE
 
     void Update()
     {
+        // Block input when menu is open
+        if (MainMenuManager.IsGamePaused())
+            return;
+
         // Handle number key input
         if (isSelectable && resultNumber >= 1 && resultNumber <= 10)
         {

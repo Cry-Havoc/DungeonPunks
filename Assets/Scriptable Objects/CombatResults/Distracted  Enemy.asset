@@ -19,4 +19,4 @@ MonoBehaviour:
   - action: {fileID: 11400000, guid: 90cce6a76e214d8469dc01431c5e22d1, type: 2}
     result: 1
   requiredConditions: 
-  outcomes: 0b000000
+  outcomes: 15000000

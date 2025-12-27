@@ -140,6 +140,14 @@ public class GameUIManager : MonoBehaviour
         SetCharacterMode();
     }
 
+    public void UpdatePartyUI()
+    {
+        foreach(PlayerCharacter partycharacter in partyMembers) 
+        {
+            partycharacter.TriggerStatsChanged();
+        }
+    }
+
     public void SetDungeonMode()
     {
         isCharacterMode = false;

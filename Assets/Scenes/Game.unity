@@ -168,7 +168,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 773958366696526533, guid: 002e20f24cd85b443a50195d483666a1, type: 3}
       propertyPath: healthPoints
-      value: 10
+      value: 5
       objectReference: {fileID: 0}
     - target: {fileID: 773958366696526533, guid: 002e20f24cd85b443a50195d483666a1, type: 3}
       propertyPath: characterName
@@ -176,7 +176,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 773958366696526533, guid: 002e20f24cd85b443a50195d483666a1, type: 3}
       propertyPath: maxHealthPoints
-      value: 10
+      value: 5
       objectReference: {fileID: 0}
     - target: {fileID: 773958366696526533, guid: 002e20f24cd85b443a50195d483666a1, type: 3}
       propertyPath: characterPicture
@@ -502,11 +502,11 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 773958366696526533, guid: 002e20f24cd85b443a50195d483666a1, type: 3}
       propertyPath: damageAmount
-      value: 2
+      value: 3
       objectReference: {fileID: 0}
     - target: {fileID: 773958366696526533, guid: 002e20f24cd85b443a50195d483666a1, type: 3}
       propertyPath: healthPoints
-      value: 10
+      value: 4
       objectReference: {fileID: 0}
     - target: {fileID: 773958366696526533, guid: 002e20f24cd85b443a50195d483666a1, type: 3}
       propertyPath: characterName
@@ -514,7 +514,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 773958366696526533, guid: 002e20f24cd85b443a50195d483666a1, type: 3}
       propertyPath: maxHealthPoints
-      value: 10
+      value: 4
       objectReference: {fileID: 0}
     - target: {fileID: 773958366696526533, guid: 002e20f24cd85b443a50195d483666a1, type: 3}
       propertyPath: characterPicture
@@ -881,11 +881,11 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 773958366696526533, guid: 002e20f24cd85b443a50195d483666a1, type: 3}
       propertyPath: damageAmount
-      value: 2
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 773958366696526533, guid: 002e20f24cd85b443a50195d483666a1, type: 3}
       propertyPath: healthPoints
-      value: 10
+      value: 6
       objectReference: {fileID: 0}
     - target: {fileID: 773958366696526533, guid: 002e20f24cd85b443a50195d483666a1, type: 3}
       propertyPath: characterName
@@ -893,7 +893,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 773958366696526533, guid: 002e20f24cd85b443a50195d483666a1, type: 3}
       propertyPath: maxHealthPoints
-      value: 10
+      value: 6
       objectReference: {fileID: 0}
     - target: {fileID: 773958366696526533, guid: 002e20f24cd85b443a50195d483666a1, type: 3}
       propertyPath: characterPicture
@@ -1006,11 +1006,11 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 773958366696526533, guid: 002e20f24cd85b443a50195d483666a1, type: 3}
       propertyPath: damageAmount
-      value: 2
+      value: 3
       objectReference: {fileID: 0}
     - target: {fileID: 773958366696526533, guid: 002e20f24cd85b443a50195d483666a1, type: 3}
       propertyPath: healthPoints
-      value: 10
+      value: 4
       objectReference: {fileID: 0}
     - target: {fileID: 773958366696526533, guid: 002e20f24cd85b443a50195d483666a1, type: 3}
       propertyPath: characterName
@@ -1018,7 +1018,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 773958366696526533, guid: 002e20f24cd85b443a50195d483666a1, type: 3}
       propertyPath: maxHealthPoints
-      value: 10
+      value: 4
       objectReference: {fileID: 0}
     - target: {fileID: 773958366696526533, guid: 002e20f24cd85b443a50195d483666a1, type: 3}
       propertyPath: characterPicture
@@ -1827,15 +1827,19 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 773958366696526533, guid: 002e20f24cd85b443a50195d483666a1, type: 3}
       propertyPath: damageAmount
-      value: 2
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 773958366696526533, guid: 002e20f24cd85b443a50195d483666a1, type: 3}
       propertyPath: healthPoints
-      value: 10
+      value: 6
       objectReference: {fileID: 0}
     - target: {fileID: 773958366696526533, guid: 002e20f24cd85b443a50195d483666a1, type: 3}
       propertyPath: characterName
       value: Divinus
+      objectReference: {fileID: 0}
+    - target: {fileID: 773958366696526533, guid: 002e20f24cd85b443a50195d483666a1, type: 3}
+      propertyPath: maxHealthPoints
+      value: 6
       objectReference: {fileID: 0}
     - target: {fileID: 773958366696526533, guid: 002e20f24cd85b443a50195d483666a1, type: 3}
       propertyPath: characterPicture
@@ -2324,6 +2328,124 @@ Light:
   m_UseViewFrustumForShadowCasterCull: 1
   m_ShadowRadius: 0
   m_ShadowAngle: 0
+--- !u!1 &1644147610
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1644147612}
+  - component: {fileID: 1644147611}
+  - component: {fileID: 1644147614}
+  - component: {fileID: 1644147613}
+  m_Layer: 0
+  m_Name: PrisonerManager
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &1644147611
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1644147610}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 59b363c2a9a0bf5488bda02d7651456b, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  characterButtonContainer: {fileID: 2133680214}
+  characterButtonPrefab: {fileID: 4849867878993728735, guid: 90478ed0acc91fa47922494c94ff1b7f, type: 3}
+  instructionText: {fileID: 1998994140}
+--- !u!4 &1644147612
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1644147610}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 1910, y: 780, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &1644147613
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1644147610}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 881d83138899cf740a8eef79f32b83ee, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  prisonerCount: 10
+  prisonerNames:
+  - Jargo
+  - Smithereens
+  - Havoc
+  - Lupus
+  - Criz
+  - Mordred
+  - Gay Gareth
+  - Hippolyta
+  - Isaac
+  - Jacky the VI
+  - Old Ken
+  - Young Ken
+  - Marca
+  - Nova
+  - Orpheus
+  - Paris
+  - Coalhead
+  - Lady Black
+  - Lady White
+  - Toy
+  prisonerTypes:
+  - Warrior
+  - Mage
+  - Thief
+  - Cleric
+  - Ranger
+  - Paladin
+  - Bard
+  - Monk
+  - Druid
+  - Warlock
+  minDistanceBetweenPrisoners: 5
+--- !u!114 &1644147614
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1644147610}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 2b707ea04a2289247bfcf174f11b8d0f, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  lightPrefab: {fileID: 2487370640950774546, guid: 5f250366b3807e54cab156f2b7c9bb44, type: 3}
+  prisonerLightColor: {r: 1, g: 0.5, b: 0, a: 1}
+  prisonerLightIntensity: 5
+  prisonerLightRange: 6
+  entranceLightColor: {r: 0, g: 0.5, b: 1, a: 1}
+  entranceLightIntensity: 5
+  entranceLightRange: 6
+  minFlickerIntensity: 0.8
+  maxFlickerIntensity: 1.2
+  flickerSpeed: 10
+  flickerSmoothing: 0.1
 --- !u!1 &1793725306
 GameObject:
   m_ObjectHideFlags: 0
@@ -2591,6 +2713,8 @@ MonoBehaviour:
   monsterListContainer: {fileID: 1563622809}
   actionListContainer: {fileID: 2002890404}
   actionResultListContainer: {fileID: 1447364039}
+  currentActingPlayer: {fileID: 0}
+  randomAllyPlayer: {fileID: 0}
 --- !u!1001 &1914738311
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -2910,27 +3034,13 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: 'Because you''re young, sharp as a knife
-
-    You need that buzz to come
-    alive
-
-    Out on the edge, out on the town
-
-    You ain''t got time to settle
-    down
-
-    You''re always sure, you''re always right
-
-    You see it all in black
-    and white
-
-    You never listen to anyone
-
-    Because you''re young'
+  m_text: "Because you're young, sharp as a knife\nYou need that buzz to come alive\nOut
+    on the edge, out on the town\u26CB\r  \u26CA\nYou ain't got time to settle down\nYou're
+    always sure, you're always right\nYou see it all in black and white\nYou never
+    listen to anyone"
   m_isRightToLeft: 0
-  m_fontAsset: {fileID: 11400000, guid: f9288636a50387a45a5a62c2228e0cf1, type: 2}
-  m_sharedMaterial: {fileID: 7936226481991253880, guid: f9288636a50387a45a5a62c2228e0cf1, type: 2}
+  m_fontAsset: {fileID: 11400000, guid: 14542a0d8b7b1bd44a438cad8135184e, type: 2}
+  m_sharedMaterial: {fileID: 59973575476895994, guid: 14542a0d8b7b1bd44a438cad8135184e, type: 2}
   m_fontSharedMaterials: []
   m_fontMaterial: {fileID: 0}
   m_fontMaterials: []
@@ -3164,6 +3274,7 @@ RectTransform:
   - {fileID: 759222267}
   - {fileID: 1998994139}
   - {fileID: 1563622809}
+  - {fileID: 2133680214}
   - {fileID: 2002890404}
   - {fileID: 1447364039}
   - {fileID: 1307410911}
@@ -3218,6 +3329,68 @@ Transform:
   - {fileID: 676090886}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1 &2133680213
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 2133680214}
+  - component: {fileID: 2133680215}
+  m_Layer: 5
+  m_Name: Player_UI_List
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!224 &2133680214
+RectTransform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2133680213}
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 2017742615}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+  m_AnchorMin: {x: 0.5, y: 0.5}
+  m_AnchorMax: {x: 0.5, y: 0.5}
+  m_AnchoredPosition: {x: 63, y: 351}
+  m_SizeDelta: {x: 100, y: 100}
+  m_Pivot: {x: 0.5, y: 0.5}
+--- !u!114 &2133680215
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2133680213}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 59f8146938fff824cb5fd77236b75775, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_Padding:
+    m_Left: 0
+    m_Right: 0
+    m_Top: 0
+    m_Bottom: 0
+  m_ChildAlignment: 0
+  m_Spacing: 0
+  m_ChildForceExpandWidth: 1
+  m_ChildForceExpandHeight: 1
+  m_ChildControlWidth: 0
+  m_ChildControlHeight: 0
+  m_ChildScaleWidth: 0
+  m_ChildScaleHeight: 0
+  m_ReverseArrangement: 0
 --- !u!1 &2134134027
 GameObject:
   m_ObjectHideFlags: 0
@@ -3813,11 +3986,15 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 773958366696526533, guid: 002e20f24cd85b443a50195d483666a1, type: 3}
       propertyPath: healthPoints
-      value: 10
+      value: 5
       objectReference: {fileID: 0}
     - target: {fileID: 773958366696526533, guid: 002e20f24cd85b443a50195d483666a1, type: 3}
       propertyPath: characterName
       value: Poly
+      objectReference: {fileID: 0}
+    - target: {fileID: 773958366696526533, guid: 002e20f24cd85b443a50195d483666a1, type: 3}
+      propertyPath: maxHealthPoints
+      value: 5
       objectReference: {fileID: 0}
     - target: {fileID: 773958366696526533, guid: 002e20f24cd85b443a50195d483666a1, type: 3}
       propertyPath: characterPicture
@@ -4316,3 +4493,4 @@ SceneRoots:
   - {fileID: 1537774135}
   - {fileID: 2052579772}
   - {fileID: 928672888}
+  - {fileID: 1644147612}

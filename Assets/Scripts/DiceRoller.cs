@@ -248,8 +248,8 @@ public class DiceRoller : MonoBehaviour
 
     IEnumerator HandleAdvantageDisadvantageWithCounts(int tensValue, int onesValue, int initialResult, int advantageCount, int disadvantageCount)
     {
-        int tensActual = (tensValue == 0) ? 10 : tensValue;
-        int onesActual = (onesValue == 0) ? 10 : onesValue;
+        int tensActual = tensValue; //(tensValue == 0) ? 10 : tensValue;
+        int onesActual = onesValue; //(onesValue == 0) ? 10 : onesValue;
 
         // Check for mirror dice
         if (tensActual == onesActual)
@@ -269,145 +269,147 @@ public class DiceRoller : MonoBehaviour
             onRollComplete?.Invoke(initialResult);
             yield break;
         }
-
-        int finalResult = initialResult;
-        bool needSwap = false;
-
-        // Calculate net advantage/disadvantage
-        int netAdvantage = advantageCount - disadvantageCount;
-        string rollTypeDisplayText = "";
-
-        if (netAdvantage > 0)
+        else
         {
-            // Net Advantage
-            currentRollType = RollType.Advantage;
+            int finalResult = initialResult;
+            bool needSwap = false;
 
-            // Lower number gets blue
-            if (tensActual < onesActual)
-            {
-                tensDigitDie.SetMaterial(blueMaterial);
-                onesDigitDie.SetMaterial(whiteMaterial);
-            }
-            else
-            {
-                tensDigitDie.SetMaterial(whiteMaterial);
-                onesDigitDie.SetMaterial(blueMaterial);
-            }
+            // Calculate net advantage/disadvantage
+            int netAdvantage = advantageCount - disadvantageCount;
+            string rollTypeDisplayText = "";
 
-            // If lower is on right (ones), swap to bring it to front
-            if (onesActual < tensActual)
+            if (netAdvantage > 0)
             {
-                needSwap = true;
-            }
+                // Net Advantage
+                currentRollType = RollType.Advantage;
 
-            // Build display text
-            if (disadvantageCount > 0)
-            {
-                rollTypeDisplayText = $"{advantageCount} Advantage - <s>{disadvantageCount} Disadvantage</s>";
-            }
-            else
-            {
-                rollTypeDisplayText = "Advantage";
-            }
-
-            if (rollResultText != null)
-            {
-                rollResultText.text = rollTypeDisplayText;
-                rollResultText.color = GameUIManager.Instance.positiveText;
-            }
-        }
-        else if (netAdvantage < 0)
-        {
-            // Net Disadvantage
-            currentRollType = RollType.Disadvantage;
-
-            // Higher number gets red
-            if (tensActual > onesActual)
-            {
-                tensDigitDie.SetMaterial(redMaterial);
-                onesDigitDie.SetMaterial(whiteMaterial);
-            }
-            else
-            {
-                tensDigitDie.SetMaterial(whiteMaterial);
-                onesDigitDie.SetMaterial(redMaterial);
-            }
-
-            // If higher is on right (ones), swap to bring it to front
-            if (onesActual > tensActual)
-            {
-                needSwap = true;
-            }
-
-            // Build display text
-            if (advantageCount > 0)
-            {
-                rollTypeDisplayText = $"<s>{advantageCount} Advantage</s> - {disadvantageCount} Disadvantage";
-            }
-            else
-            {
-                rollTypeDisplayText = "Disadvantage";
-            }
-
-            if (rollResultText != null)
-            {
-                rollResultText.text = rollTypeDisplayText;
-                rollResultText.color = Color.red;
-            }
-        }
-        else if (advantageCount > 0 && disadvantageCount > 0)
-        {
-            // Tie - both cancel out
-            currentRollType = RollType.Normal;
-
-            rollTypeDisplayText = $"<s>{advantageCount} Advantage</s> - <s>{disadvantageCount} Disadvantage</s>";
-
-            if (rollResultText != null)
-            {
-                rollResultText.text = rollTypeDisplayText;
-                rollResultText.color = Color.white;
-            }
-        }
-
-        // Perform swap animation if needed
-        if (needSwap)
-        {
-            yield return new WaitForSeconds(0.5f); // Brief pause before swap
-            yield return StartCoroutine(SwapDiceAnimation());
-
-            // Calculate swapped result
-            finalResult = CalculateResult(onesValue, tensValue);
-        }
-
-        // Add success/failure text
-        bool finalSuccess = finalResult <= currentSkillValue;
-        string finalSuccessText = finalSuccess ? "Success" : "Failure";
-        Color finalSuccessColor = finalSuccess ? GameUIManager.Instance.positiveText : GameUIManager.Instance.negativeText;
-
-        if (rollResultText != null)
-        {
-            if (currentRollType == RollType.Normal && advantageCount == 0 && disadvantageCount == 0)
-            {
-                rollResultText.text = finalSuccessText;
-                rollResultText.color = finalSuccessColor;
-            }
-            else
-            {
-                Color rollTypeColor = currentRollType == RollType.Advantage ? GameUIManager.Instance.positiveText :
-                                      currentRollType == RollType.Disadvantage ? GameUIManager.Instance.negativeText: GameUIManager.Instance.normalText;
-
-                if (!string.IsNullOrEmpty(rollTypeDisplayText))
+                // Lower number gets blue
+                if (tensActual < onesActual)
                 {
-                    rollResultText.text = $"{rollTypeDisplayText}\n<color=#{ColorUtility.ToHtmlStringRGB(finalSuccessColor)}>{finalSuccessText}</color>";
+                    tensDigitDie.SetMaterial(blueMaterial);
+                    onesDigitDie.SetMaterial(whiteMaterial);
                 }
                 else
                 {
-                    rollResultText.text = $"<color=#{ColorUtility.ToHtmlStringRGB(finalSuccessColor)}>{finalSuccessText}</color>";
+                    tensDigitDie.SetMaterial(whiteMaterial);
+                    onesDigitDie.SetMaterial(blueMaterial);
+                }
+
+                // If lower is on right (ones), swap to bring it to front
+                if (onesActual < tensActual)
+                {
+                    needSwap = true;
+                }
+
+                // Build display text
+                if (disadvantageCount > 0)
+                {
+                    rollTypeDisplayText = $"{advantageCount} Advantage - <s>{disadvantageCount} Disadvantage</s>";
+                }
+                else
+                {
+                    rollTypeDisplayText = "Advantage";
+                }
+
+                if (rollResultText != null)
+                {
+                    rollResultText.text = rollTypeDisplayText;
+                    rollResultText.color = GameUIManager.Instance.positiveText;
                 }
             }
-        }
+            else if (netAdvantage < 0)
+            {
+                // Net Disadvantage
+                currentRollType = RollType.Disadvantage;
 
-        onRollComplete?.Invoke(finalResult);
+                // Higher number gets red
+                if (tensActual > onesActual)
+                {
+                    tensDigitDie.SetMaterial(redMaterial);
+                    onesDigitDie.SetMaterial(whiteMaterial);
+                }
+                else
+                {
+                    tensDigitDie.SetMaterial(whiteMaterial);
+                    onesDigitDie.SetMaterial(redMaterial);
+                }
+
+                // If higher is on right (ones), swap to bring it to front
+                if (onesActual > tensActual)
+                {
+                    needSwap = true;
+                }
+
+                // Build display text
+                if (advantageCount > 0)
+                {
+                    rollTypeDisplayText = $"<s>{advantageCount} Advantage</s> - {disadvantageCount} Disadvantage";
+                }
+                else
+                {
+                    rollTypeDisplayText = "Disadvantage";
+                }
+
+                if (rollResultText != null)
+                {
+                    rollResultText.text = rollTypeDisplayText;
+                    rollResultText.color = Color.red;
+                }
+            }
+            else if (advantageCount > 0 && disadvantageCount > 0)
+            {
+                // Tie - both cancel out
+                currentRollType = RollType.Normal;
+
+                rollTypeDisplayText = $"<s>{advantageCount} Advantage</s> - <s>{disadvantageCount} Disadvantage</s>";
+
+                if (rollResultText != null)
+                {
+                    rollResultText.text = rollTypeDisplayText;
+                    rollResultText.color = Color.white;
+                }
+            }
+
+            // Perform swap animation if needed
+            if (needSwap)
+            {
+                yield return new WaitForSeconds(0.5f); // Brief pause before swap
+                yield return StartCoroutine(SwapDiceAnimation());
+
+                // Calculate swapped result
+                finalResult = CalculateResult(onesValue, tensValue);
+            }
+
+            // Add success/failure text
+            bool finalSuccess = finalResult <= currentSkillValue;
+            string finalSuccessText = finalSuccess ? "Success" : "Failure";
+            Color finalSuccessColor = finalSuccess ? GameUIManager.Instance.positiveText : GameUIManager.Instance.negativeText;
+
+            if (rollResultText != null)
+            {
+                if (currentRollType == RollType.Normal && advantageCount == 0 && disadvantageCount == 0)
+                {
+                    rollResultText.text = finalSuccessText;
+                    rollResultText.color = finalSuccessColor;
+                }
+                else
+                {
+                    Color rollTypeColor = currentRollType == RollType.Advantage ? GameUIManager.Instance.positiveText :
+                                          currentRollType == RollType.Disadvantage ? GameUIManager.Instance.negativeText : GameUIManager.Instance.normalText;
+
+                    if (!string.IsNullOrEmpty(rollTypeDisplayText))
+                    {
+                        rollResultText.text = $"{rollTypeDisplayText}\n<color=#{ColorUtility.ToHtmlStringRGB(finalSuccessColor)}>{finalSuccessText}</color>";
+                    }
+                    else
+                    {
+                        rollResultText.text = $"<color=#{ColorUtility.ToHtmlStringRGB(finalSuccessColor)}>{finalSuccessText}</color>";
+                    }
+                }
+            }
+
+            onRollComplete?.Invoke(finalResult);
+        }
     }
 
     IEnumerator SwapDiceAnimation()
@@ -460,13 +462,12 @@ public class DiceRoller : MonoBehaviour
 
     int CalculateResult(int tens, int ones)
     {
-        int tensDigit = (tens == 0) ? 10 : tens;
-        int onesDigit = (ones == 0) ? 10 : ones;
+        //int tensDigit = (tens == 0) ? 10 : tens;
+        //int onesDigit = (ones == 0) ? 10 : ones;
 
-        int result = (tensDigit * 10) + onesDigit;
+        int result = (tens * 10) + ones;
 
-        if (result > 100) result = 100;
-        if (result < 1) result = 1;
+        if (result == 0) result = 100; 
 
         return result;
     }

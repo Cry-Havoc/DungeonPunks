@@ -43,11 +43,7 @@ public class PrisonerData
             case "warrior":
                 skillToTeach = PlayerAttribute.FORCE;
                 baseUpgradeValue = 50;
-                break;
-            case "mage":
-                skillToTeach = PlayerAttribute.REASON;
-                baseUpgradeValue = 50;
-                break;
+                break; 
             case "thief":
                 skillToTeach = PlayerAttribute.REFLEXE;
                 baseUpgradeValue = 50;
@@ -61,7 +57,7 @@ public class PrisonerData
                 baseUpgradeValue = 45;
                 break;
             case "paladin":
-                skillToTeach = PlayerAttribute.FORCE;
+                skillToTeach = PlayerAttribute.STAMINA;
                 baseUpgradeValue = 45;
                 break;
             case "bard":
@@ -77,7 +73,19 @@ public class PrisonerData
                 baseUpgradeValue = 45;
                 break;
             case "warlock":
-                skillToTeach = PlayerAttribute.REASON;
+                skillToTeach = PlayerAttribute.HEART;
+                baseUpgradeValue = 55;
+                break;
+            case "barbarian":
+                skillToTeach = PlayerAttribute.FORCE;
+                baseUpgradeValue = 55;
+                break;
+            case "beggar":
+                skillToTeach = PlayerAttribute.PERCEPTION;
+                baseUpgradeValue = 45;
+                break;
+            case "dancer":
+                skillToTeach = PlayerAttribute.REFLEXE;
                 baseUpgradeValue = 55;
                 break;
             default:
@@ -116,7 +124,8 @@ public class PrisonerData
     public string GetRescueMessage()
     {
         return $"You found your old friend {prisonerName}!\n\n" +
-               $"Freed from their shackles, the {prisonerType} tells you of their hard times in the dungeon, " +
+               $"Freed from their shackles, the {prisonerType} \n\n" +
+               $"tells you of their hard times in the dungeon,\n\n" +
                $"only surviving on their {GetSkillName()}.\n\n" +
                $"{prisonerName} is willing to share their knowledge...";
     }

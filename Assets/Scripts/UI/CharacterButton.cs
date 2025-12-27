@@ -10,7 +10,7 @@ public class CharacterButton : MonoBehaviour, IPointerClickHandler, IPointerEnte
     public Color hoverColor = Color.yellow;
 
     private int characterNumber;
-    private Monster monster;
+    public Monster monster;
     private bool isSelectable = false;
     private int characterIndex;
 
@@ -48,7 +48,7 @@ public class CharacterButton : MonoBehaviour, IPointerClickHandler, IPointerEnte
     {
         if (characterText != null && monster != null)
         {
-            characterText.text = $"{characterNumber}. {monster.monsterName} {monster.GetHealthDisplay()}";
+            characterText.text = $"{characterNumber}. {monster.monsterName} {monster.GetHealthDisplay()} {monster.GetMonsterStatusEffect()}";
         }
     }
 

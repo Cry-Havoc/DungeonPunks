@@ -14,7 +14,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   resultName: Covering Attack
   buttonText: Covering Attack
-  description: damage redirected to random ally & ally deals damage back
+  description: random ally damaged & ally deals damage back
   resultTypes:
   - action: {fileID: 11400000, guid: 9cb3a27235aa14343a67623502a1aaec, type: 2}
     result: 0

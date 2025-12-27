@@ -70,6 +70,7 @@ public class MonsterSpawnManager : MonoBehaviour
                 pendingAnnouncementTexts.Add(spawnData.GetRumorText());
                 
                 Debug.Log($"Day {currentDay}: {spawnData.GetMonsterName()} now Wandering_Rare");
+                return; //break so this only happens once
             }
             // Check if a Wandering_Rare monster should become common  
             else if (spawnData.spawnState == MonsterSpawnState.Wandering_Rare)
@@ -81,6 +82,7 @@ public class MonsterSpawnManager : MonoBehaviour
                     pendingAnnouncementTexts.Add(spawnData.GetCommonText());
                     
                     Debug.Log($"Day {currentDay}: {spawnData.GetMonsterName()} now Wandering");
+                    return; //break so this only happens once
                 }
             }
         }

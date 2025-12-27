@@ -14,9 +14,9 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   resultName: Reckless Enemy
   buttonText: Reckless Enemy
-  description: enemy  is taunted and all are attack against them are focused
+  description: enemy is taunted and unbalanced
   resultTypes:
   - action: {fileID: 11400000, guid: 90cce6a76e214d8469dc01431c5e22d1, type: 2}
     result: 0
   requiredConditions: 
-  outcomes: 0d0000000b000000
+  outcomes: 0d00000013000000

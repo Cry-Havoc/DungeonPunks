@@ -14,7 +14,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   resultName: Covering Push
   buttonText: Covering Push
-  description: damage redirected to random ally & enemy can not act next turn
+  description: random ally damaged & enemy can not act
   resultTypes:
   - action: {fileID: 11400000, guid: 9cb3a27235aa14343a67623502a1aaec, type: 2}
     result: 0

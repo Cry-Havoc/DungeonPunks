@@ -101,17 +101,16 @@ public class PrisonerLightingSystem : MonoBehaviour
             entranceLight = Instantiate(lightPrefab, worldPos, Quaternion.identity, transform);
             entranceLight.name = "Entrance_Light";
 
-            Light lightComponent = entranceLight.GetComponent<Light>();
+            Light lightComponent = entranceLight.GetComponentInChildren<Light>();
             if (lightComponent != null)
-            {
-                lightComponent.type = LightType.Point;
+            { 
                 lightComponent.color = entranceLightColor;
                 lightComponent.intensity = entranceLightIntensity;
                 lightComponent.range = entranceLightRange;
             }
 
             // Add flicker component
-            FlickeringLight flickerScript = entranceLight.GetComponent<FlickeringLight>();
+            FlickeringLight flickerScript = entranceLight.GetComponentInChildren<FlickeringLight>();
             if (flickerScript == null)
             {
                 flickerScript = entranceLight.AddComponent<FlickeringLight>();
@@ -144,20 +143,19 @@ public class PrisonerLightingSystem : MonoBehaviour
             GameObject prisonerLight = Instantiate(lightPrefab, worldPos, Quaternion.identity, transform);
             prisonerLight.name = $"Prisoner_Light_{position.x}_{position.y}";
 
-            Light lightComponent = prisonerLight.GetComponent<Light>();
+            Light lightComponent = prisonerLight.GetComponentInChildren<Light>();
             if (lightComponent != null)
-            {
-                lightComponent.type = LightType.Point;
+            { 
                 lightComponent.color = prisonerLightColor;
                 lightComponent.intensity = prisonerLightIntensity;
                 lightComponent.range = prisonerLightRange;
             }
 
             // Add flicker component
-            FlickeringLight flickerScript = prisonerLight.GetComponent<FlickeringLight>();
+            FlickeringLight flickerScript = prisonerLight.GetComponentInChildren<FlickeringLight>();
             if (flickerScript == null)
             {
-                flickerScript = prisonerLight.AddComponent<FlickeringLight>();
+                flickerScript = prisonerLight.GetComponentInChildren<FlickeringLight>();
             }
             
             flickerScript.Initialize(

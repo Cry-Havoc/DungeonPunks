@@ -9,8 +9,7 @@ public class PrisonerTeachingUI : MonoBehaviour
 {
     public static PrisonerTeachingUI Instance { get; private set; }
 
-    [Header("UI References")]
-    public GameObject characterSelectionPanel;
+    [Header("UI References")] 
     public Transform characterButtonContainer;
     public GameObject characterButtonPrefab;
     public TextMeshProUGUI instructionText;
@@ -19,7 +18,8 @@ public class PrisonerTeachingUI : MonoBehaviour
     private PrisonerData currentPrisoner;
     private PlayerCharacter[] partyMembers;
     private List<GameObject> activeButtons = new List<GameObject>();
-    private System.Action onTeachingComplete;
+    private System.Action onTeachingComplete; 
+
 
     void Awake()
     {
@@ -30,12 +30,7 @@ public class PrisonerTeachingUI : MonoBehaviour
         else
         {
             Destroy(gameObject);
-        }
-
-        if (characterSelectionPanel != null)
-        {
-            characterSelectionPanel.SetActive(false);
-        }
+        } 
     }
 
     /// <summary>
@@ -49,17 +44,11 @@ public class PrisonerTeachingUI : MonoBehaviour
 
         // Clear existing buttons
         ClearButtons();
-
-        // Show panel
-        if (characterSelectionPanel != null)
-        {
-            characterSelectionPanel.SetActive(true);
-        }
-
+          
         // Update instruction text
         if (instructionText != null)
         {
-            instructionText.text = $"Select a character to receive {prisoner.GetSkillName()} training from {prisoner.prisonerName}:";
+            instructionText.text = $"Who will receive {prisoner.GetSkillName()} training from {prisoner.prisonerName}?";
         }
 
         // Create character buttons
@@ -70,7 +59,8 @@ public class PrisonerTeachingUI : MonoBehaviour
     /// Creates clickable buttons for each character
     /// </summary>
     void CreateCharacterButtons()
-    {
+    { 
+        characterButtonContainer.gameObject.SetActive(true);
         for (int i = 0; i < partyMembers.Length; i++)
         {
             if (partyMembers[i] == null) continue;
@@ -206,11 +196,8 @@ public class PrisonerTeachingUI : MonoBehaviour
     /// </summary>
     void HideTeachingUI()
     {
-        if (characterSelectionPanel != null)
-        {
-            characterSelectionPanel.SetActive(false);
-        }
-
+        currentPrisoner = null;
+        characterButtonContainer.gameObject.SetActive(false);
         ClearButtons();
     }
 
@@ -238,7 +225,7 @@ public class PrisonerTeachingUI : MonoBehaviour
         if (MainMenuManager.IsGamePaused())
             return;
 
-        if (!characterSelectionPanel.activeSelf) return;
+        if (currentPrisoner == null) return;
 
         // Numbers 1-9 for direct selection
         for (int i = 0; i < 9 && i < partyMembers.Length; i++)

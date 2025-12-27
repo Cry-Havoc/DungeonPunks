@@ -51,7 +51,21 @@ public class PlayerFrameUI : MonoBehaviour, IPointerClickHandler
         // Set name
         if (nameText != null)
         {
-            nameText.text = character.characterName;
+            nameText.text = character.characterName + " " + PlayerCharacter.GetStatusSymbols(character) + " ";
+
+            if(character.healthPoints <= 0)
+            {
+                nameText.color = GameUIManager.Instance.negativeText;
+            }
+            else if (CombatManager.Instance.currentActingPlayer == character)
+            {
+                nameText.color = GameUIManager.Instance.positiveText;
+            } 
+            else  
+            {
+                nameText.color = GameUIManager.Instance.normalText;
+            }
+            
         }
 
         // Set health with box characters
@@ -69,7 +83,7 @@ public class PlayerFrameUI : MonoBehaviour, IPointerClickHandler
                     healthDisplay += "□"; // Empty box
                 }
             }
-            healthText.text = healthDisplay;
+            healthText.text = healthDisplay + " ";
         }
     }
 

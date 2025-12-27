@@ -16,11 +16,11 @@ MonoBehaviour:
   buttonText: Ask an Ally for Help
   description: 
   triggerType: 1
-  successCheckAttribute: 3
-  criticalCheckAttribute: 6
-  fumbleCheckAttribute: 0
+  successCheckAttribute: 6
+  criticalCheckAttribute: 2
+  fumbleCheckAttribute: 3
   successRollType: 0
   criticalRollType: 0
   fumbleRollType: 0
   targetSelectionText: Which enemy does {CHARACTER} want to target?
-  actionVerb: get help with
+  actionVerb: getting help with

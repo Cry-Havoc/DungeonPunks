@@ -77,7 +77,7 @@ public class RestManager : MonoBehaviour
     /// </summary>
     public void ClearRestOffer()
     {
-        if (waitingForRestInput && !isResting)
+        /*if (waitingForRestInput && !isResting)
         {
             waitingForRestInput = false;
             
@@ -85,7 +85,7 @@ public class RestManager : MonoBehaviour
             {
                 GameUIManager.Instance.encounterText.text = "";
             }
-        }
+        }*/     
     }
 
     /// <summary>

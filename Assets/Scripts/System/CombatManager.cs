@@ -4,6 +4,7 @@ using TMPro;
 using System.Collections.Generic;
 using System.Linq;
 using static DiceRoller;
+using System.Threading;
 
 public class CombatManager : MonoBehaviour
 {
@@ -40,8 +41,8 @@ public class CombatManager : MonoBehaviour
     private bool selectingMonster = false;
     private bool selectingAction = false;
     private bool selectingActionResult = false;
-    private PlayerCharacter currentActingPlayer;
-    private PlayerCharacter randomAllyPlayer;
+    public PlayerCharacter currentActingPlayer;
+    public PlayerCharacter randomAllyPlayer;
     private PlayerAction currentAction;
     private Monster currentTarget;
     private ActionResult currentResult;
@@ -73,6 +74,14 @@ public class CombatManager : MonoBehaviour
         if (waitingForSpace && !selectingMonster && !selectingAction && !selectingActionResult && Input.GetKeyDown(KeyCode.Space))
         {
             onSpacePressed?.Invoke();
+        }
+
+        if (Input.GetKey(KeyCode.P) && Input.GetKey(KeyCode.U))
+        {
+            if (isInCombat)
+            {
+                ExecuteInstantWinCheat();
+            }
         }
     }
 
@@ -184,7 +193,11 @@ public class CombatManager : MonoBehaviour
         }
         else
         {
-            if (monsterNames.Count > 0)
+            if(monsterNames.Count == 1)
+            { 
+                encounterText.text += "A group of " + monsterNames[0] + "s is attacking you\n\nPress <u>Space</u> to continue..";
+            }
+            else if (monsterNames.Count > 0)
             {
                 // Add all but the last monster
                 for (int i = 0; i < monsterNames.Count - 1; i++)
@@ -196,6 +209,10 @@ public class CombatManager : MonoBehaviour
                 string lastMonster = monsterNames[monsterNames.Count - 1];
                 encounterText.text += "and " + lastMonster + "s are attacking you\n\nPress <u>Space</u> to continue..";
             }
+            else
+            {
+                Debug.LogError("monsterNames.Count == 0");
+            }
         }
         encounterImage.gameObject.SetActive(true);
 
@@ -206,6 +223,14 @@ public class CombatManager : MonoBehaviour
         onSpacePressed = StartPlayerTurn;
     }
 
+    void ExecuteInstantWinCheat()
+    {
+        // Kill all monsters 
+        foreach (Monster monster in activeMonsters)
+        {
+            monster.currentHealthPoints = 0;
+        }
+    }
     Monster GetRandomMatchingPrefab(List<string> monsterNames)
     {
         var matches = monsterPrefabs
@@ -242,12 +267,19 @@ public class CombatManager : MonoBehaviour
         // Remove dead monsters and their buttons
         for (int i = characterButtons.Count - 1; i >= 0; i--)
         {
-            if (!activeMonsters[i].IsAlive())
+            if (characterButtons[i].monster == null || !characterButtons[i].monster.IsAlive())
             {
+                for (int monsterIndex = activeMonsters.Count - 1; monsterIndex >= 0; monsterIndex--)
+                {
+                    if (activeMonsters[monsterIndex]  == null || !activeMonsters[monsterIndex].IsAlive())
+                    {
+                        Destroy(activeMonsters[monsterIndex].gameObject);
+                        activeMonsters.RemoveAt(monsterIndex);
+                    }
+                }
+
                 Destroy(characterButtons[i].gameObject);
-                Destroy(activeMonsters[i].gameObject);
-                characterButtons.RemoveAt(i);
-                activeMonsters.RemoveAt(i);
+                characterButtons.RemoveAt(i); 
             }
         }
 
@@ -310,6 +342,8 @@ public class CombatManager : MonoBehaviour
         encounterText.text = $"It's time for {currentActingPlayer.characterName} to act...";
 
         currentActionType = ActionTriggerType.ActiveCombat;
+
+        GameUIManager.Instance.UpdatePartyUI();
 
         // Show action selection
         ShowActionSelection();
@@ -424,7 +458,7 @@ public class CombatManager : MonoBehaviour
         // Apply advantage/disadvantage if player has status effects
         DiceRoller.RollTypeData successRollType = GetModifiedRollType(currentAction.successRollType, true);
 
-        encounterText.text += $"\nRoll lower than {successAttr} ({successValue})...";
+        encounterText.text += $"\nRoll lower than {successAttr} {successValue}";
 
         bool successPassed = false;
         int successRoll = 0;
@@ -461,7 +495,7 @@ public class CombatManager : MonoBehaviour
             string criticalAttr = currentAction.GetAttributeName(currentAction.criticalCheckAttribute);
             DiceRoller.RollTypeData criticalRollType = GetModifiedRollType(currentAction.criticalRollType, true);
 
-            encounterText.text += $"\nFor a Critical roll lower than {criticalAttr} ({criticalValue})...";
+            encounterText.text += $"\nFor a Critical roll lower than {criticalAttr} {criticalValue}";
 
             bool criticalPassed = false;
             int criticalRoll = 0;
@@ -487,7 +521,7 @@ public class CombatManager : MonoBehaviour
             string fumbleAttr = currentAction.GetAttributeName(currentAction.fumbleCheckAttribute);
             DiceRoller.RollTypeData fumbleRollType = GetModifiedRollType(currentAction.fumbleRollType, false);
 
-            encounterText.text += $"\nTo avoid a Fumble roll lower than {fumbleAttr} ({fumbleValue})...";
+            encounterText.text += $"\nTo avoid a Fumble roll lower than {fumbleAttr} {fumbleValue}";
 
             bool fumblePassed = false;
             int fumbleRoll = 0;
@@ -531,7 +565,7 @@ public class CombatManager : MonoBehaviour
         int countAdvantages = 0;
 
         // Check player status effects
-        if (currentActingPlayer.advantageCount > 0)
+            if (currentActingPlayer.advantageCount > 0)
         {
             currentActingPlayer.advantageCount--;
             countAdvantages++;
@@ -551,6 +585,16 @@ public class CombatManager : MonoBehaviour
             currentActingPlayer.disadvantageAttackCount--;
             countDisadvantages++;
         }
+        if(isAttack && currentTarget.advantageWhenAttackedCount > 0) 
+        {
+            currentTarget.advantageWhenAttackedCount--;
+            countAdvantages++;
+        }
+        if (isAttack && currentTarget.disadvantageWhenAttackedCount > 0)
+        {
+            currentTarget.disadvantageWhenAttackedCount--;
+            countDisadvantages++;
+        }
         if (!isAttack && currentActingPlayer.advantageDefenseCount > 0)
         {
             currentActingPlayer.advantageDefenseCount--;
@@ -559,6 +603,16 @@ public class CombatManager : MonoBehaviour
         if (!isAttack && currentActingPlayer.disadvantageDefenseCount > 0)
         {
             currentActingPlayer.disadvantageCount--;
+            countDisadvantages++;
+        }
+        if (!isAttack && currentTarget.advantageWhenDefendedAgainstCount > 0)
+        {
+            currentTarget.advantageWhenDefendedAgainstCount--;
+            countAdvantages++;
+        }
+        if (!isAttack && currentTarget.disadvantageWhenDefendedAgainstCount > 0)
+        {
+            currentTarget.disadvantageWhenDefendedAgainstCount--;
             countDisadvantages++;
         }
 
@@ -579,6 +633,7 @@ public class CombatManager : MonoBehaviour
 
         rollTypeData.advantages = countAdvantages;
         rollTypeData.disadvantages = countDisadvantages;
+
         return rollTypeData;
     }
     string GetResultText(ActionResult result)
@@ -628,6 +683,8 @@ public class CombatManager : MonoBehaviour
             actionResultButtons.Add(resultBtn);
         }
 
+        GameUIManager.Instance.UpdatePartyUI();
+
         actionResultListContainer.gameObject.SetActive(true);
     }
 
@@ -664,14 +721,12 @@ public class CombatManager : MonoBehaviour
         {
             randomAllyPlayer = eligiblePlayers[Random.Range(0, eligiblePlayers.Count)];
         }
+        GameUIManager.Instance.UpdatePartyUI();
 
         foreach (var outcome in result.outcomes)
         {
             ExecuteOutcome(outcome, result);
-        }
-
-        // Clear temporary status effects used in this action
-        ClearTemporaryStatusEffects();
+        } 
 
         // Update UI
         UpdateCharacterButtons();
@@ -761,52 +816,76 @@ public class CombatManager : MonoBehaviour
 
             case ActionOutcome.GainAdvantageNextRoll:
                 currentActingPlayer.advantageCount++;
+                encounterText.text += $"\n{currentActingPlayer.characterName} is inspired <color=#{ColorUtility.ToHtmlStringRGB(GameUIManager.Instance.positiveText)}>⛤</color>";
+
                 break;
 
             case ActionOutcome.GainDisadvantageNextRoll:
                 currentActingPlayer.disadvantageCount++;
+                encounterText.text += $"\n{currentActingPlayer.characterName} is confused <color=#{ColorUtility.ToHtmlStringRGB(GameUIManager.Instance.negativeText)}>⛤</color>";
+
                 break;
 
             case ActionOutcome.GainAdvantageNextAttack:
                 currentActingPlayer.advantageAttackCount++;
+                encounterText.text += $"\n{currentActingPlayer.characterName} is focused <color=#{ColorUtility.ToHtmlStringRGB(GameUIManager.Instance.positiveText)}>⏃</color>";
+
                 break;
 
             case ActionOutcome.GainDisadvantageNextAttack:
                 currentActingPlayer.disadvantageAttackCount++;
+                encounterText.text += $"\n{currentActingPlayer.characterName} is weakened <color=#{ColorUtility.ToHtmlStringRGB(GameUIManager.Instance.negativeText)}>⏃</color>";
+
                 break;
 
             case ActionOutcome.GainAdvantageNextDefense:
                 currentActingPlayer.advantageDefenseCount++;
+                encounterText.text += $"\n{currentActingPlayer.characterName} is guarded <color=#{ColorUtility.ToHtmlStringRGB(GameUIManager.Instance.positiveText)}>⏣</color>";
+
                 break;
 
             case ActionOutcome.GainDisadvantageNextDefense:
                 currentActingPlayer.disadvantageDefenseCount++;
+                encounterText.text += $"\n{currentActingPlayer.characterName} is unbalanced <color=#{ColorUtility.ToHtmlStringRGB(GameUIManager.Instance.negativeText)}>⏣</color>";
+
                 break;
 
             case ActionOutcome.EnemyAttacksAreDefendedWithAdvantage:
                 currentTarget.advantageWhenDefendedAgainstCount++;
-                encounterText.text += $"\nDefending against {currentTarget.monsterName} gains advantage";
+                currentTarget.advantageWhenDefendedAgainstCount++;
+                currentTarget.advantageWhenDefendedAgainstCount++;
+
+                encounterText.text += $"\n{currentTarget.monsterName} is weakened <color=#{ColorUtility.ToHtmlStringRGB(GameUIManager.Instance.negativeText)}>⏃</color>";
                 break;
 
             case ActionOutcome.EnemyAttacksAreDefendedWithDisadvantage:
                 currentTarget.disadvantageWhenDefendedAgainstCount++;
-                encounterText.text += $"\nDefending against {currentTarget.monsterName} gets disadvantage";
+                currentTarget.disadvantageWhenDefendedAgainstCount++;
+                currentTarget.disadvantageWhenDefendedAgainstCount++;
+
+                encounterText.text += $"\n {currentTarget.monsterName} is focused <color=# {ColorUtility.ToHtmlStringRGB(GameUIManager.Instance.positiveText)} >⏃</color>";
                 break;
 
             case ActionOutcome.EnemyIsAttackedWithAdvantage:
                 currentTarget.advantageWhenAttackedCount++;
-                encounterText.text += $"\nAttacking {currentTarget.monsterName} gains advantage";
+                currentTarget.advantageWhenAttackedCount++;
+                currentTarget.advantageWhenAttackedCount++;
+
+                encounterText.text += $"\n{currentTarget.monsterName} is unbalanced <color=#{ColorUtility.ToHtmlStringRGB(GameUIManager.Instance.negativeText)}>⏣</color>";
                 break;
 
             case ActionOutcome.EnemyIsAttackedWithDisadvantage:
                 currentTarget.disadvantageWhenAttackedCount++;
-                encounterText.text += $"\nAttacking {currentTarget.monsterName} gets disadvantage";
+                currentTarget.disadvantageWhenAttackedCount++;
+                currentTarget.disadvantageWhenAttackedCount++;
+
+                encounterText.text += $"\n{currentTarget.monsterName} is guarded <color=#{ColorUtility.ToHtmlStringRGB(GameUIManager.Instance.positiveText)}>⏣</color>";
                 break;
 
             case ActionOutcome.TauntEnemy:
                 currentTarget.isTaunted = true;
                 currentTarget.tauntedBy = currentActingPlayer;
-                encounterText.text += $"\n{currentTarget.monsterName} is taunted by {currentActingPlayer.characterName}";
+                encounterText.text += $"\n{currentTarget.monsterName} is taunted by {currentActingPlayer.characterName} ⚐";
                 break;
 
             case ActionOutcome.TauntAllEnemies:
@@ -818,7 +897,7 @@ public class CombatManager : MonoBehaviour
                         monster.tauntedBy = currentActingPlayer;
                     }
                 }
-                encounterText.text += $"\nAll enemies are taunted by {currentActingPlayer.characterName}";
+                encounterText.text += $"\nAll enemies are taunted by {currentActingPlayer.characterName} ⚐";
                 break;
 
             case ActionOutcome.AllyDealsNormalDamage:
@@ -826,27 +905,17 @@ public class CombatManager : MonoBehaviour
                 encounterText.text += $"\n{currentTarget.monsterName} suffers {randomAllyPlayer.damageAmount} damage";
                 break;
 
-                // Add more outcomes as needed
+            case ActionOutcome.AllyGainDisadvantageNextTurn:
+                randomAllyPlayer.disadvantageCount++;
+                encounterText.text += $"\n{randomAllyPlayer.characterName} is confused <color=#{ColorUtility.ToHtmlStringRGB(GameUIManager.Instance.negativeText)}>⛤</color>";
+
+                break;
         }
+
+        GameUIManager.Instance.UpdatePartyUI();
 
         encounterText.text += "\n";
-    }
-
-    void ClearTemporaryStatusEffects()
-    {
-        // Clear single-use status effects
-        currentActingPlayer.advantageCount = 0;
-        currentActingPlayer.disadvantageCount = 0;
-        currentActingPlayer.advantageAttackCount = 0;
-        currentActingPlayer.disadvantageAttackCount = 0;
-
-        // Clear used enemy modifiers
-        if (currentTarget != null)
-        {
-            currentTarget.advantageWhenAttackedCount = 0;
-            currentTarget.disadvantageWhenAttackedCount = 0;
-        }
-    }
+    } 
 
     void StartMonsterTurn()
     {
@@ -906,6 +975,11 @@ public class CombatManager : MonoBehaviour
         waitingForSpace = true;
 
         currentActionType = ActionTriggerType.ReactionCombat;
+
+        currentActingPlayer = target;
+        randomAllyPlayer = null;
+
+        GameUIManager.Instance.UpdatePartyUI();
 
         ShowActionSelection();
         // Check if all players dead

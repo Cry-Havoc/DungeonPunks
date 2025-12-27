@@ -1,20 +1,24 @@
 using UnityEngine;
 using UnityEngine.UI;
 using TMPro;
+using UnityEngine.EventSystems;
+using UnityEditor.Experimental.GraphView;
 
 /// <summary>
 /// Button for selecting a character to receive prisoner training
 /// </summary>
-public class CharacterSelectButton : MonoBehaviour
+public class CharacterSelectButton : MonoBehaviour, IPointerClickHandler, IPointerEnterHandler, IPointerExitHandler
 {
-    [Header("UI Components")]
-    public Button button;
-    public TextMeshProUGUI buttonText;
+    [Header("UI Components")] 
+    public TextMeshProUGUI playerText;
 
     private int characterNumber;
     private PlayerCharacter character;
     private PrisonerData prisoner;
     private System.Action onClickCallback;
+
+    private bool isSelectable = false;
+
 
     /// <summary>
     /// Initializes the button with character data
@@ -25,14 +29,9 @@ public class CharacterSelectButton : MonoBehaviour
         character = playerChar;
         prisoner = prisonerData;
         onClickCallback = onClick;
+        isSelectable = true;
 
-        UpdateDisplay();
-
-        if (button != null)
-        {
-            button.onClick.RemoveAllListeners();
-            button.onClick.AddListener(OnButtonClick);
-        }
+        UpdateDisplay(); 
     }
 
     /// <summary>
@@ -40,7 +39,7 @@ public class CharacterSelectButton : MonoBehaviour
     /// </summary>
     void UpdateDisplay()
     {
-        if (character == null || prisoner == null || buttonText == null)
+        if (character == null || prisoner == null || playerText == null)
             return;
 
         // Get current attribute value
@@ -52,7 +51,7 @@ public class CharacterSelectButton : MonoBehaviour
 
         // Format display
         string skillName = prisoner.GetSkillName();
-        buttonText.text = $"{characterNumber}. {character.characterName}\n" +
+        playerText.text = $"{characterNumber}. {character.characterName} " +
                          $"{skillName}: {currentValue} → {newValue} (+{upgradeAmount})";
     }
 
@@ -82,11 +81,51 @@ public class CharacterSelectButton : MonoBehaviour
         }
     }
 
-    /// <summary>
-    /// Handles button click
-    /// </summary>
-    void OnButtonClick()
+    void Update()
     {
-        onClickCallback?.Invoke();
+        // Block input when menu is open
+        if (MainMenuManager.IsGamePaused())
+            return;
+
+        // Handle number key input
+        if (isSelectable && characterNumber >= 1 && characterNumber <= 8)
+        {
+            if (Input.GetKeyDown(KeyCode.Alpha1 + (characterNumber - 1)))
+            {
+                OnPointerClick(null);
+            }
+        }
+    }
+    public void SetSelectable(bool selectable)
+    {
+        isSelectable = selectable;
+        if (!selectable && playerText != null)
+        {
+            playerText.color = GameUIManager.Instance.normalText;
+        }
+    }
+
+    public void OnPointerClick(PointerEventData eventData)
+    {
+        if (isSelectable )
+        {
+            onClickCallback.Invoke();
+        }
+    }
+
+    public void OnPointerEnter(PointerEventData eventData)
+    {
+        if (isSelectable && playerText != null)
+        {
+            playerText.color = GameUIManager.Instance.positiveText;
+        }
+    }
+
+    public void OnPointerExit(PointerEventData eventData)
+    {
+        if (playerText != null)
+        {
+            playerText.color = GameUIManager.Instance.normalText;
+        }
     }
 }

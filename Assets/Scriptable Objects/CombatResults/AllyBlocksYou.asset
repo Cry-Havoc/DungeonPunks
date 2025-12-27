@@ -14,9 +14,9 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   resultName: Ally is the Way
   buttonText: Ally is the Way
-  description: damage redirected to random ally & you have disadvantage
+  description: random ally damaged & you have disadvantage
   resultTypes:
   - action: {fileID: 11400000, guid: 9cb3a27235aa14343a67623502a1aaec, type: 2}
     result: 1
   requiredConditions: 
-  outcomes: 1d0000001f000000
+  outcomes: 1d0000000c000000
